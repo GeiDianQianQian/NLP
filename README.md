@@ -1,7 +1,8 @@
-# Homework 1
+# Project structure
 
-File structure:
 
-  - [README.lperesde](./answer/README.lperesde)
-  - [README.tmosharr](./answer/README.tmosharr)
+### Homework 1 - Word Segmentation
+
+  - [README.lperesde](./segmenter/answer/README.lperesde)
+  - [README.tmosharr](./segmenter/answer/README.tmosharr)
 
