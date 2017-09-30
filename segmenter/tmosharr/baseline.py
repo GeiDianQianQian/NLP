@@ -66,8 +66,9 @@ with open(opts.input) as f:
 
         #initializing priorityqueue, gather candidates for first word
         inserted=0
-        for first_word in keys:
-            if(first_word==input[0:len(first_word)]):
+        for allowed_length in [1,2,3,4,5,6,7,8,9,10]:
+            first_word=input[0:allowed_length]
+            if(first_word in Pw):
                 entry=Entry(first_word,0,math.log(Pw(first_word),2),None)
                 pq.put((0,entry))
                 inserted+=1
@@ -93,8 +94,9 @@ with open(opts.input) as f:
             #gather candidates for next word
             next_start=endindex+1
             inserted = 0
-            for next_word in keys:
-                if (next_word==(input[next_start:next_start+len(next_word)])):
+            for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+                next_word = input[next_start:next_start+allowed_length]
+                if(next_word in Pw):
                     next_entry = Entry(next_word, next_start, entry.log_prob+math.log(Pw(next_word), 2), entry)
                     pq.put((next_start,next_entry))
                     inserted+=1
