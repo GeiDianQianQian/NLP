@@ -86,7 +86,7 @@ with open(opts.input) as f:
     #recursive
     while pq.empty()==False:
         entry=pq.get()
-        endindex=entry.start_pos+len(entry.word)
+        endindex=entry.start_pos+len(entry.word)-1
         if(chart[endindex]!=None):
             if(chart[endindex].log_prob<entry.log_prob):
                 chart[endindex]=entry
@@ -99,5 +99,5 @@ with open(opts.input) as f:
             if (new_word.startswith(input[new_start])):
                 new_entry = Entry(new_word, new_start, entry.log_prob+math.log(Pw(new_word), 2), entry)
                 pq.put(new_entry, new_start)
-        print len(pq)
+
 sys.stdout = old
