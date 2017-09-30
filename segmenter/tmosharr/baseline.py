@@ -3,9 +3,9 @@ import sys, codecs, optparse, os, math
 from Queue import PriorityQueue
 
 optparser = optparse.OptionParser()
-optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
-optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
-optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
+optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('../data', 'count_1w.txt'), help="unigram counts")
+optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('../data', 'count_2w.txt'), help="bigram counts")
+optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('../data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
 
 class Pdist(dict):
@@ -99,5 +99,9 @@ with open(opts.input) as f:
             if (new_word.startswith(input[new_start])):
                 new_entry = Entry(new_word, new_start, entry.log_prob+math.log(Pw(new_word), 2), entry)
                 pq.put(new_entry, new_start)
+
+    for el in chart:
+        if el != None and el.word != None:
+            print(el.word+" ")
 
 sys.stdout = old
