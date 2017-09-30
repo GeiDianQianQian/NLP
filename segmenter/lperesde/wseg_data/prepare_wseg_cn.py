@@ -1,4 +1,4 @@
-# this script prepare the data on wseg set in the same format of the count_1w.txt
+#this script prepare the data on wseg set in the same format of the count_1w.txt
 import sys, codecs, optparse, os
 
 optparser = optparse.OptionParser()
@@ -17,6 +17,6 @@ with open(opts.input) as f:
             dict[key] = value
 
     for key, value in dict.items():
-        print (key + "" + "\t" + str(value) + "\n")
+        print (key + "" + "\t" + str(value))
 
 sys.stdout = old
