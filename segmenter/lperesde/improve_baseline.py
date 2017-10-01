@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import sys, codecs, optparse, os, math
-from Queue import PriorityQueue
+from Queue import PriorityQueue, Queue
 
 optparser = optparse.OptionParser()
-optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('wseg_data', 'count_wseg.txt'), help="unigram counts")
+optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
 optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
@@ -33,110 +32,110 @@ class Pdist(dict):
 
 class Entry:
     # Entry to be used
-    def __init__(self,word,start_pos,log_prob,back_ptr):
-        self.word=word
-        self.start_pos=start_pos
-        self.log_prob=log_prob
-        self.back_ptr=back_ptr
+    def __init__(self, word, start_pos, log_prob):
+        self.word        = word
+        self.start_pos   = start_pos
+        self.probability = log_prob
 
 # the default segmenter does not use any probabilities, but you could ...
-Pw  = Pdist(opts.counts1w)
-keys= Pw.keys()
-pq  = PriorityQueue()
+Pw    = Pdist(opts.counts1w)
+# Pw2   = Pdist(opts.counts2w)
+keys  = Pw.keys()
+pq    = PriorityQueue()
+queue = Queue()
 
 old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
 
-def buildPossibilities(chart):
-    #recursive
-    while pq.empty() == False:
-        # try to insert a word
-        _,entry = pq.get()
-        endindex = entry.start_pos + len(entry.word) - 1
-        if(chart[endindex] != None):
-            if(chart[endindex].log_prob < entry.log_prob):
-                chart[endindex] = entry
-            else:
-                continue
+def isNumber(x, beggining):
+    # if is between 0 and 9 or has a separator
+    return ((x >= u'\uFF10' and x <= u'\uFF19')
+            or (not beggining and x == "·".decode('utf-8')))
+
+def isPunctuation(x):
+    return ((x >= u'\u3000' and x <= u'\u303F') or
+           (x >= u'\uFF01' and x <= u'\uFF0F') or
+           (x >= u'\uFF1A' and x <= u'\uFF20') or
+           (x >= u'\uFF3B' and x <= u'\uFF40') or
+           (x >= u'\uFF5B' and x <= u'\uFF65'))
+
+def getNumber(input, idx):
+    word = input[idx]
+    idx += 1
+    while idx < len(input) and isNumber(input[idx], False):
+        word += input[idx]
+        idx += 1
+
+    if idx < len(input) and not isPunctuation(input[idx]):
+        word += input[idx]
+        idx += 1
+
+    return (idx - 1, word)
+
+def getEntryMemoized(input, idx, cache, stack):
+    # we will check up to 10 symbols at time, no more than that
+    cnt  = 0
+    i    = idx
+    word = ""
+    arr = Queue()
+    while ((i < len(input)) and
+          (not isNumber(input[i], True)) and
+          (not isPunctuation(input[i]))):
+          word += input[i]
+          # memoize values
+          ans   = 0
+          if word in cache:
+              ans = cache[word]
+          elif word in Pw:
+              ans = Pw(word) * 0.5 if len(word) == 2 else Pw(word)
+              cache[word] = ans
+              entry = Entry(word, i, math.log(ans, 2))
+              (_, stk) = getEntryMemoized(input, i + 1, cache, stack)
+              stack = stk
+              arr.put(entry)
+          else:
+              cache[word] = None
+
+          i += 1
+
+    prob_item = Entry("", 0, 1.0)
+    while not arr.empty():
+        item = arr.get()
+        if item.probability < prob_item.probability:
+            prob_item = item
+    stack.append(prob_item)
+
+    return (i - 1, stack)
+
+
+count = 0
+right_p = -0.000001
+for line in open(opts.input).readlines():
+    utf8line = unicode(line.strip(), 'utf-8')
+
+    idx = 0
+    while idx < len(utf8line):
+        ch = utf8line[idx]
+        if isPunctuation(ch):
+            entry = Entry(ch, idx, right_p)
+            queue.put(entry)
+        elif isNumber(ch, True):
+            (i, number) = getNumber(utf8line, idx)
+            entry = Entry(number, idx, right_p)
+            idx = i
+            queue.put(entry)
         else:
-            chart[endindex] = entry
+            (i, stk) = getEntryMemoized(utf8line, idx, {}, [])
+            for item in reversed(stk):
+                if item.word != "":
+                    queue.put(item)
+            idx = i
 
-        # gather candidates for next word
-        next_start=endindex+1
-        inserted = 0
-        for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
-            next_word = input[next_start:next_start+allowed_length]
-            if(next_word in Pw):
-                next_entry = Entry(next_word,
-                                   next_start,
-                                   entry.log_prob + math.log(Pw(next_word), 2),
-                                   entry)
-                pq.put((next_start,next_entry))
-                inserted += 1
+        idx += 1
 
-        if((inserted == 0) and (next_start <= finalindex)):
-            next_word = input[next_start]
-            next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2), entry)
-            pq.put((next_start, next_entry))
-
-def isNumber(word):
-    if word[0] == "·".decode('utf-8'):
-        return false
-    for x in word:
-        if ((x >= "０".decode('utf-8') and "９".decode('utf-8'))
-            or x == "·".decode('utf-8')):
-            value = True
-        else:
-            return False
-
-    return True
-
-# def getNumber(input, initial):
-#     word = input[0:1]
-#     idx = 2
-#     while isNumber(input[idx-1:idx], False):
-#         word = input[0:idx]
-#         idx += 1
-#     return (idx - 1, word)
-
-count=0
-with open(opts.input) as f:
-
-    # getting the input ready, ommitting newline, joining together
-    for line in f:
-        input = unicode(line.strip(), 'utf-8')
-
-        #initializing chart
-        finalindex = len(input) - 1
-        chart = [None] * (finalindex + 1)
-
-        #initializing priorityqueue, gather candidates for first word
-        inserted = 0
-        for allowed_length in xrange(1, 10):
-            first_word = input[0:allowed_length]
-            if isNumber(first_word):
-                entry = Entry(first_word, 0, -1.0, None)
-                pq.put((0, entry))
-                inserted += 1
-            elif(first_word in Pw):
-                factor = 1.1 if len(first_word) in [2, 3] else 1
-                entry = Entry(first_word, 0, math.log(Pw(first_word), 2) * factor, None)
-                pq.put((0, entry))
-                inserted += 1
-
-        if(inserted == 0):
-            first_word = input[0]
-            entry = Entry(first_word, 0, math.log(Pw(first_word), 2), None)
-            pq.put((0,entry))
-
-        buildPossibilities(chart)
-
-        wordlist = []
-        current_entry = chart[finalindex]
-        while(current_entry != None):
-            wordlist.append(current_entry.word)
-            current_entry = current_entry.back_ptr
-        wordlist.reverse()
-        print " ".join(wordlist)
+    while (not queue.empty()):
+        item = queue.get()
+        sys.stdout.write(item.word + " ")
+    print("")
 
 sys.stdout = old
