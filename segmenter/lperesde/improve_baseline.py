@@ -38,11 +38,12 @@ class Entry:
         self.probability = log_prob
 
 # the default segmenter does not use any probabilities, but you could ...
-Pw    = Pdist(opts.counts1w)
+Pw     = Pdist(opts.counts1w)
 # Pw2   = Pdist(opts.counts2w)
-keys  = Pw.keys()
-pq    = PriorityQueue()
-queue = Queue()
+keys   = Pw.keys()
+pq     = PriorityQueue()
+queue  = Queue()
+minint = -sys.maxint
 
 old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
@@ -72,43 +73,52 @@ def getNumber(input, idx):
 
     return (idx - 1, word)
 
-def getEntryMemoized(input, idx, cache, stack):
-    # we will check up to 10 symbols at time, no more than that
-    cnt  = 0
-    i    = idx
-    word = ""
-    arr = Queue()
+def getEndWord(input, idx):
+    i = idx
     while ((i < len(input)) and
           (not isNumber(input[i], True)) and
           (not isPunctuation(input[i]))):
-          word += input[i]
+        i += 1
+
+    return (i - 1)
+
+def getEntryMemoized(input, idx, endidx, cache, stack):
+    # we will check up to 10 symbols at time, no more than that
+    cnt  = 0
+    word = ""
+    endi = getEndWord(input, idx) if endidx == minint else endidx
+    i    = endi
+    arr  = Queue()
+    # we start from thew
+    while (i >= idx):
+          word = input[i] + word
           # memoize values
           ans   = 0
           if word in cache:
               ans = cache[word]
           elif word in Pw:
-              ans = Pw(word) * 0.5 if len(word) == 2 else Pw(word)
+              ans = Pw(word)
               cache[word] = ans
-              entry = Entry(word, i, math.log(ans, 2))
-              (_, stk) = getEntryMemoized(input, i + 1, cache, stack)
+              entry = Entry(word, i, math.log(ans, 10))
+              #blah = " pos: " + str(i) + " prob: " + str(math.log(ans, 10))
+              #print("word: " + entry.word + blah)
+              (_, stk) = getEntryMemoized(input, idx, i - 1, cache, stack)
               stack = stk
               arr.put(entry)
           else:
               cache[word] = None
 
-          i += 1
+          i -= 1
 
-    prob_item = Entry("", 0, 1.0)
+    prob_item = Entry("", 0, minint)
     while not arr.empty():
         item = arr.get()
-        if item.probability < prob_item.probability:
+        if item.probability > prob_item.probability:
             prob_item = item
     stack.append(prob_item)
 
-    return (i - 1, stack)
+    return (endi, stack)
 
-
-count = 0
 right_p = -0.000001
 for line in open(opts.input).readlines():
     utf8line = unicode(line.strip(), 'utf-8')
@@ -125,8 +135,8 @@ for line in open(opts.input).readlines():
             idx = i
             queue.put(entry)
         else:
-            (i, stk) = getEntryMemoized(utf8line, idx, {}, [])
-            for item in reversed(stk):
+            (i, stk) = getEntryMemoized(utf8line, idx, minint, {}, [])
+            for item in stk:
                 if item.word != "":
                     queue.put(item)
             idx = i
