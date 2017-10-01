@@ -12,7 +12,7 @@ class Pdist(dict):
     "A probability distribution estimated from counts in datafile."
 
     def __init__(self, filename, sep='\t', N=None, missingfn=None):
-        self.maxlen = 0 
+        self.maxlen = 0
         for line in file(filename):
             (key, freq) = line.split(sep)
             try:
@@ -44,6 +44,7 @@ class Entry:
 
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
+Pw2=   Pdist(opts.counts2w)
 keys= Pw.keys()
 pq  = PriorityQueue()
 
@@ -66,7 +67,7 @@ with open(opts.input) as f:
 
         #initializing priorityqueue, gather candidates for first word
         inserted=0
-        for allowed_length in [1,2,3,4,5,6,7,8,9,10,11,12,13,14]:
+        for allowed_length in [1,2,3,4,5,6,7,8,9,10]:
             first_word=input[0:allowed_length]
             if(first_word in Pw):
                 entry=Entry(first_word,0,math.log(Pw(first_word),2),None)
@@ -94,10 +95,13 @@ with open(opts.input) as f:
             #gather candidates for next word
             next_start=endindex+1
             inserted = 0
-            for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14]:
+            for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
                 next_word = input[next_start:next_start+allowed_length]
                 if(next_word in Pw):
-                    next_entry = Entry(next_word, next_start, entry.log_prob+math.log(Pw(next_word), 2), entry)
+                    if(entry.word+" "+next_word in Pw2):
+                        next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2)+ math.log(Pw2(entry.word+" "+next_word), 2), entry)
+                    else:
+                        next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2), entry)
                     pq.put((next_start,next_entry))
                     inserted+=1
             if((inserted==0) and (next_start<=finalindex)):
