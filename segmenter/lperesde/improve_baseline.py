@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys, codecs, optparse, os, math
 from Queue import PriorityQueue
 
@@ -11,7 +13,7 @@ class Pdist(dict):
     "A probability distribution estimated from counts in datafile."
 
     def __init__(self, filename, sep='\t', N=None, missingfn=None):
-        self.maxlen = 0 
+        self.maxlen = 0
         for line in file(filename):
             (key, freq) = line.split(sep)
             try:
@@ -41,6 +43,9 @@ class Entry:
 Pw  = Pdist(opts.counts1w)
 keys= Pw.keys()
 pq  = PriorityQueue()
+
+old = sys.stdout
+sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
 
 def buildPossibilities(chart):
     #recursive
@@ -74,9 +79,26 @@ def buildPossibilities(chart):
             next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2), entry)
             pq.put((next_start, next_entry))
 
-old = sys.stdout
-sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
-input=""
+def isNumber(word):
+    if word[0] == "·".decode('utf-8'):
+        return false
+    for x in word:
+        if ((x >= "０".decode('utf-8') and "９".decode('utf-8'))
+            or x == "·".decode('utf-8')):
+            value = True
+        else:
+            return False
+
+    return True
+
+# def getNumber(input, initial):
+#     word = input[0:1]
+#     idx = 2
+#     while isNumber(input[idx-1:idx], False):
+#         word = input[0:idx]
+#         idx += 1
+#     return (idx - 1, word)
+
 count=0
 with open(opts.input) as f:
 
@@ -90,20 +112,24 @@ with open(opts.input) as f:
 
         #initializing priorityqueue, gather candidates for first word
         inserted = 0
-        for allowed_length in [1,2,3,4,5,6,7,8,9,10]:
+        for allowed_length in xrange(1, 10):
             first_word = input[0:allowed_length]
-            if(first_word in Pw):
-                entry = Entry(first_word,0,math.log(Pw(first_word),2),None)
-                pq.put((0,entry))
+            if isNumber(first_word):
+                entry = Entry(first_word, 0, -1.0, None)
+                pq.put((0, entry))
+                inserted += 1
+            elif(first_word in Pw):
+                factor = 1.1 if len(first_word) in [2, 3] else 1
+                entry = Entry(first_word, 0, math.log(Pw(first_word), 2) * factor, None)
+                pq.put((0, entry))
                 inserted += 1
 
         if(inserted == 0):
             first_word = input[0]
-            entry = Entry(first_word,0,math.log(Pw(first_word),2), None)
+            entry = Entry(first_word, 0, math.log(Pw(first_word), 2), None)
             pq.put((0,entry))
 
-        while pq.empty() == False:
-            buildPossibilities(chart)
+        buildPossibilities(chart)
 
         wordlist = []
         current_entry = chart[finalindex]
