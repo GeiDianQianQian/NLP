@@ -30,6 +30,9 @@ class Pdist(dict):
         elif len(key) == 1: return self.missingfn(key, self.N)
         else: return None
 
+    def probOfUnknown(self):
+        return 0.5/float(self.N)
+
 class Entry:
     # Entry to be used
     def __init__(self, word, start_pos, log_prob):
@@ -95,21 +98,21 @@ def getGoodStack(item, stack):
         item = stack.pop()
         stack = getGoodStack(item, stack)
     else:
-        if len(stack) >= len(item.word)-1:
-            # slice last elements
-            nslice = (len(item.word) - 1) * (-1);
-            items = stack[nslice:]
-            if nslice != 0:
-                for _ in range(len(items)): stack.pop()
-                if (items[0].start_pos == item.start_pos):
-                    stack.append(item)
-                else:
-                    # if not, put them back
-                    stack.extend(items)
-                    stack.append(item)
-            else:
-                # if we did not do anything, append item back
+        #if len(stack) >= len(item.word)-1:
+        # slice last elements
+        nslice = (len(item.word) - 1) * (-1);
+        items = stack[nslice:]
+        if nslice != 0:
+            for _ in range(len(items)): stack.pop()
+            if (items[0].start_pos == item.start_pos):
                 stack.append(item)
+            else:
+                # if not, put them back
+                stack.extend(items)
+                stack.append(item)
+        else:
+            # if we did not do anything, append item back
+            stack.append(item)
 
     return stack
 
@@ -125,6 +128,7 @@ def getEntryMemoized(input, idx, endidx, cache, stack):
           word = input[i] + word
           # memoize values
           ans   = 0
+          entry = None
           if word in cache:
               ans = cache[word]
           elif word in Pw:
@@ -137,7 +141,13 @@ def getEntryMemoized(input, idx, endidx, cache, stack):
               stack = stk
               arr.put(entry)
           else:
-              cache[word] = None
+              ans = Pw.probOfUnknown()
+              #entry = Entry(word, i, math.log(ans, 10))
+              cache[word] = ans
+            #   # if it gets here, you should pray
+            #   (_, stk) = getEntryMemoized(input, idx, i - 1, cache, stack)
+            #   stack = stk
+            #   arr.put(entry)
 
           i -= 1
 
@@ -181,6 +191,9 @@ for line in open(opts.input).readlines():
         idx += 1
     cnt += 1
 
+    # print("======================== INPUT ")
+    # print(utf8line)
+    # print("======================== OUTPUT ")
     if (not queue.empty()):
         item = queue.get()
         sys.stdout.write(item.word)
@@ -190,7 +203,7 @@ for line in open(opts.input).readlines():
     print("")
     # print("========================")
     #
-    # if (cnt == 2):
+    # if (cnt == 3):
     #     exit(0)
 
 sys.stdout = old
