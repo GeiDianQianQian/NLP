@@ -3,7 +3,7 @@ import sys, codecs, optparse, os, math
 from Queue import Queue
 
 optparser = optparse.OptionParser()
-optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
+optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('wseg_data', 'count_wseg.txt'), help="unigram counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
 optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
@@ -137,7 +137,7 @@ def getEntryMemoized(input, idx, endidx, sub, cache, stack):
           if word in cache:
               ans = cache[word]
           elif word in Pw:
-              ans = Pw(word) * 5 if len(word) == 2 else Pw(word)
+              ans = Pw(word)
               cache[word] = ans
               entry = Entry(word, i, math.log(ans, 10))
             #   blah = " pos: " + str(i) + " prob: " + str(math.log(ans, 10))
@@ -156,6 +156,14 @@ def getEntryMemoized(input, idx, endidx, sub, cache, stack):
     prob_item = Entry("", 0, minint)
     while not arr.empty():
         item = arr.get()
+        word = ""
+        if (len(item.word) > 1) and stack:
+            nslice = (len(item.word) - 1) * (-1);
+            items = stack[nslice:]
+            word = "".join([i.word for i in items])
+        if (word + prob_item.word) == item.word:
+            # if a word is containing another it is twice as possible to be the right one
+            item.probability /= 2
         if item.probability > prob_item.probability:
             prob_item = item
 
