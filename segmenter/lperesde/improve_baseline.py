@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys, codecs, optparse, os, math
-from Queue import PriorityQueue, Queue
+from Queue import Queue
 
 optparser = optparse.OptionParser()
 optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
@@ -44,7 +44,6 @@ class Entry:
 Pw     = Pdist(opts.counts1w)
 # Pw2   = Pdist(opts.counts2w)
 keys   = Pw.keys()
-pq     = PriorityQueue()
 queue  = Queue()
 minint = -sys.maxint
 
@@ -76,14 +75,14 @@ def getNumber(input, idx):
 
     return (idx - 1, word)
 
-def getEndWord(input, idx):
+def getEndWord(input, idx, sub):
     i = idx
     while ((i < len(input)) and
           (not isNumber(input[i], True)) and
           (not isPunctuation(input[i]))):
         i += 1
 
-    return (i - 1)
+    return (i - 1 - sub)
 
 # get biggest words
 def getGoodStack(item, stack):
@@ -116,11 +115,17 @@ def getGoodStack(item, stack):
 
     return stack
 
-def getEntryMemoized(input, idx, endidx, cache, stack):
+def getUnknown(utf8line, idx, sub):
+    if (sub >= len(utf8line) - idx):
+        return (0, utf8line)
+    else:
+        return (idx, utf8line[idx : idx + sub])
+
+def getEntryMemoized(input, idx, endidx, sub, cache, stack):
     # we will check up to 10 symbols at time, no more than that
     cnt  = 0
     word = ""
-    endi = getEndWord(input, idx) if endidx == minint else endidx
+    endi = getEndWord(input, idx, sub) if endidx == minint else endidx
     i    = endi
     arr  = Queue()
     # we start from thew
@@ -132,22 +137,19 @@ def getEntryMemoized(input, idx, endidx, cache, stack):
           if word in cache:
               ans = cache[word]
           elif word in Pw:
-              ans = Pw(word)
+              ans = Pw(word) * 5 if len(word) == 2 else Pw(word)
               cache[word] = ans
               entry = Entry(word, i, math.log(ans, 10))
             #   blah = " pos: " + str(i) + " prob: " + str(math.log(ans, 10))
             #   print("word: " + entry.word + blah)
-              (_, stk) = getEntryMemoized(input, idx, i - 1, cache, stack)
+              (_, stk) = getEntryMemoized(input, idx, i - 1, sub, cache, stack)
               stack = stk
               arr.put(entry)
           else:
               ans = Pw.probOfUnknown()
               #entry = Entry(word, i, math.log(ans, 10))
               cache[word] = ans
-            #   # if it gets here, you should pray
-            #   (_, stk) = getEntryMemoized(input, idx, i - 1, cache, stack)
-            #   stack = stk
-            #   arr.put(entry)
+              #arr.put(entry)
 
           i -= 1
 
@@ -182,11 +184,25 @@ for line in open(opts.input).readlines():
             idx = i
             queue.put(entry)
         else:
-            (i, stk) = getEntryMemoized(utf8line, idx, minint, {}, [])
-            for item in stk:
-                if item.word != "":
+            if len(utf8line) > 0:
+                sub = 0
+                stk = []
+                oldidx = idx
+                while (sub < len(utf8line) - oldidx):
+                    (i, stk) = getEntryMemoized(utf8line, idx, minint, sub, {}, [])
+                    if not stk:
+                        sub += 1
+                    else:
+                        idx = i
+                        break;
+
+                if sub > 0:
+                    (i, unknown) = getUnknown(utf8line, idx + 1, sub)
+                    stk.append(Entry(unknown, i, right_p))
+                    idx = i + len(unknown) -1
+
+                for item in stk:
                     queue.put(item)
-            idx = i
 
         idx += 1
     cnt += 1
