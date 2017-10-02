@@ -82,6 +82,37 @@ def getEndWord(input, idx):
 
     return (i - 1)
 
+# get biggest words
+def getGoodStack(item, stack):
+    if not stack:
+        if not item:
+            return []
+        else:
+            stack.append(item)
+            return stack
+
+    if (item == None):
+        item = stack.pop()
+        stack = getGoodStack(item, stack)
+    else:
+        if len(stack) >= len(item.word)-1:
+            # slice last elements
+            nslice = (len(item.word) - 1) * (-1);
+            items = stack[nslice:]
+            if nslice != 0:
+                for _ in range(len(items)): stack.pop()
+                if (items[0].start_pos == item.start_pos):
+                    stack.append(item)
+                else:
+                    # if not, put them back
+                    stack.extend(items)
+                    stack.append(item)
+            else:
+                # if we did not do anything, append item back
+                stack.append(item)
+
+    return stack
+
 def getEntryMemoized(input, idx, endidx, cache, stack):
     # we will check up to 10 symbols at time, no more than that
     cnt  = 0
@@ -100,8 +131,8 @@ def getEntryMemoized(input, idx, endidx, cache, stack):
               ans = Pw(word)
               cache[word] = ans
               entry = Entry(word, i, math.log(ans, 10))
-              #blah = " pos: " + str(i) + " prob: " + str(math.log(ans, 10))
-              #print("word: " + entry.word + blah)
+            #   blah = " pos: " + str(i) + " prob: " + str(math.log(ans, 10))
+            #   print("word: " + entry.word + blah)
               (_, stk) = getEntryMemoized(input, idx, i - 1, cache, stack)
               stack = stk
               arr.put(entry)
@@ -115,11 +146,17 @@ def getEntryMemoized(input, idx, endidx, cache, stack):
         item = arr.get()
         if item.probability > prob_item.probability:
             prob_item = item
-    stack.append(prob_item)
+
+    if (prob_item.word != ""):
+        stack.append(prob_item)
+
+    stack = getGoodStack(None, stack)
+    # print ([i.word for i in stack])
 
     return (endi, stack)
 
 right_p = -0.000001
+cnt = 0
 for line in open(opts.input).readlines():
     utf8line = unicode(line.strip(), 'utf-8')
 
@@ -142,10 +179,18 @@ for line in open(opts.input).readlines():
             idx = i
 
         idx += 1
+    cnt += 1
 
+    if (not queue.empty()):
+        item = queue.get()
+        sys.stdout.write(item.word)
     while (not queue.empty()):
         item = queue.get()
-        sys.stdout.write(item.word + " ")
+        sys.stdout.write(" " + item.word)
     print("")
+    # print("========================")
+    #
+    # if (cnt == 2):
+    #     exit(0)
 
 sys.stdout = old
