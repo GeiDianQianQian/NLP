@@ -3,7 +3,7 @@ import sys, codecs, optparse, os, math
 from Queue import PriorityQueue
 
 optparser = optparse.OptionParser()
-optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
+optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_2_1w.txt'), help="unigram counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
 optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
@@ -11,24 +11,33 @@ optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('da
 class Pdist(dict):
     "A probability distribution estimated from counts in datafile."
 
-    def __init__(self, filename, sep='\t', N=None, missingfn=None):
+    def __init__(self, filename, sep='\t', N=None, missingfn=None, V=0):
+        self.voc=dict()
         self.maxlen = 0
+        self.V=0
         for line in file(filename):
             (key, freq) = line.split(sep)
+            if(" " in key):
+                (before,after)=key.split(" ")
+            else:
+                before=key
             try:
                 utf8key = unicode(key, 'utf-8')
+                utf8before = unicode(before, 'utf-8')
             except:
                 raise ValueError("Unexpected error %s" % (sys.exc_info()[0]))
             self[utf8key] = self.get(utf8key, 0) + int(freq)
+            self.voc[utf8before]=self.voc.get(utf8before, 0) + 1
             self.maxlen = max(len(utf8key), self.maxlen)
+        self.V= float(len(self.keys()))
         self.N = float(N or sum(self.itervalues()))
-        self.missingfn = missingfn or (lambda k, N: 1./N)
+        self.missingfn = missingfn or (lambda k, N: math.log(1,2)-math.log(float((N+self.V+1)),2))
 
     def __call__(self, key):
-        if key in self: return float(self[key])/float(self.N)
-        #else: return self.missingfn(key, self.N)
-        elif len(key) == 1: return self.missingfn(key, self.N)
-        else: return None
+        if key in self:
+            return math.log(float(self[key]+1),2)-math.log(float(self.N+self.V+1),2)
+        else:
+            return self.missingfn(key, self.N)
 
 class Entry:
     #Entry to be used
@@ -41,11 +50,9 @@ class Entry:
 
 
 
-
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
-Pw2=   Pdist(opts.counts2w)
-keys= Pw.keys()
+Pw2  = Pdist(opts.counts2w)
 pq  = PriorityQueue()
 
 old = sys.stdout
@@ -54,28 +61,30 @@ sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
 # ignoring the dictionary provided in opts.counts
 input=""
 count=0
+
+
 with open(opts.input) as f:
 
-    #getting the input ready, ommitting newline, joining together
+    #repeat for each line of input
     for line in f:
         utf8line = unicode(line.strip(), 'utf-8')
         input=utf8line
-        #print(utf8line)
+
         #initializing chart
         finalindex=len(input)-1
         chart = [None] * (finalindex+1)
 
         #initializing priorityqueue, gather candidates for first word
         inserted=0
-        for allowed_length in [1,2,3,4,5,6,7,8,9,10]:
+        for allowed_length in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]:
             first_word=input[0:allowed_length]
             if(first_word in Pw):
-                entry=Entry(first_word,0,math.log(Pw(first_word),2),None)
+                entry=Entry(first_word,0,Pw(first_word),None)
                 pq.put((0,entry))
                 inserted+=1
         if(inserted==0):
             first_word=input[0]
-            entry = Entry(first_word,0,math.log(Pw(first_word),2), None)
+            entry = Entry(first_word,0,Pw(first_word), None)
             pq.put((0,entry))
 
         #recursive
@@ -93,21 +102,43 @@ with open(opts.input) as f:
                 chart[endindex] = entry
 
             #gather candidates for next word
+            prev_word=entry.word
             next_start=endindex+1
-            inserted = 0
-            for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
-                next_word = input[next_start:next_start+allowed_length]
-                if(next_word in Pw):
-                    if(entry.word+" "+next_word in Pw2):
-                        next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2)+ math.log(Pw2(entry.word+" "+next_word), 2), entry)
+            if(prev_word in Pw):
+                inserted = 0
+                for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]:
+                    next_word = input[next_start:next_start+allowed_length]
+                    bigram=prev_word+" "+next_word
+                    if (bigram in Pw2):
+                        logprob = math.log(Pw2[bigram]+1, 2) - math.log(Pw[prev_word]+int(Pw2.voc[prev_word])+1, 2)
+                        next_entry = Entry(next_word, next_start, entry.log_prob+logprob, entry)
+                        pq.put((next_start, next_entry))
+                        inserted += 1
+                    elif(next_word in Pw):
+                        logprob = math.log(1, 2)+math.log(Pw[next_word]+1,2)-math.log(Pw.N+Pw.V+1) - math.log(Pw[prev_word] + int(Pw2.voc[prev_word]) + 1, 2)
+                        next_entry = Entry(next_word, next_start, entry.log_prob + logprob, entry)
+                        pq.put((next_start, next_entry))
+                        inserted +=1
                     else:
-                        next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2), entry)
-                    pq.put((next_start,next_entry))
-                    inserted+=1
-            if((inserted==0) and (next_start<=finalindex)):
-                next_word=input[next_start]
-                next_entry = Entry(next_word, next_start, entry.log_prob + math.log(Pw(next_word), 2), entry)
-                pq.put((next_start, next_entry))
+                        continue
+                if ((inserted == 0) and (next_start <= finalindex)):
+                    next_word = input[next_start]
+                    logprob = math.log(1, 2)+math.log(1,2)-math.log(Pw.N+Pw.V+1) - math.log(Pw[prev_word] + int(Pw.voc[prev_word]) + 1, 2)
+                    next_entry = Entry(next_word, next_start, entry.log_prob+logprob, entry)
+                    pq.put((next_start, next_entry))
+
+            else:
+                inserted = 0
+                for allowed_length in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17]:
+                    next_word = input[next_start:next_start+allowed_length]
+                    if(next_word in Pw):
+                        next_entry = Entry(next_word, next_start, entry.log_prob+Pw(next_word), entry)
+                        pq.put((next_start,next_entry))
+                        inserted+=1
+                if((inserted==0) and (next_start<=finalindex)):
+                    next_word=input[next_start]
+                    next_entry = Entry(next_word, next_start, entry.log_prob + Pw(next_word), entry)
+                    pq.put((next_start, next_entry))
 
         wordlist=[]
         current_entry=chart[finalindex]
