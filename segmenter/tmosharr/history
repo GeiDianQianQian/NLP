@@ -1,0 +1,55 @@
+﻿Contribution:
+----------------------------
+1. Implemented Baseline using only count_1w.txt
+2. Applied probability smoothing
+3. Developed probability model for bigram using prior probabilities from 	count_1w.txt and conditional probabilities from count_2w.txt
+4. Implemented Bigram model according to probability model
+5. Wrote the probability model and pseudocode in report 
+
+Commits:
+---------------------------------
+commit 736f08935171ca1a7b8f4430d772eda5f9d97ce2
+Date:   Wed Oct 4 11:35:02 2017 
+
+    Fixed some bugs in Bigram Model
+
+commit 472d55163ace9c635fd9b253896737822791f5ae
+Date:   Mon Oct 2 13:16:18 2017 
+
+    bigram partial error fixed, accuracy 88.53% in leaderboard
+
+commit c98c7eaf2bd1a85af9328f6110fe57200f59ffc4
+Date:   Sun Oct 1 12:59:23 2017 
+
+    Added the Bigram Model
+
+commit ce67103848d1c3c7b65da78b9f1411fe637b177a
+Date:   Sat Sep 30 11:13:40 2017 
+
+    baseline implementation, accuracy=80%, faster implementation
+
+commit 082d8897e7a2beee31ce74298771eba0d8099774
+Date:   Sat Sep 30 10:43:31 2017 
+
+    Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel
+    To get updated data
+
+commit 1b2c587bab1a4f51d872ae5aed37f553c4d9d3ea
+Date:   Sat Sep 30 10:31:32 2017 
+
+    baseline implementation, accuracy=80%
+
+commit d637fc467fc8c281368bb5955b045bc7875b17ef
+Date:   Fri Sep 29 21:08:31 2017 
+
+    Now its printing, still lot to go
+
+commit e9a1f349af76c0e8356715b836d32a8ef9bf2661
+Date:   Fri Sep 29 20:36:19 2017 -0400
+
+    fixed small bugs
+
+commit 353714f496ff547870cc50b7b1b22433b9003c86
+Date:   Fri Sep 29 19:56:12 2017 -0400
+
+    Adding first file for Turash
