@@ -1,0 +1,31 @@
+## Word Segmentation - Homework 1 - CMPT 383 and CMPT 413
+> This README file constains information about the taks performed by `tmosharr` on Homework 1. The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+
+### Turash Mosharraf - tmosharr
+Turash was in charge of making the baseline work as well as implementing the `bigram` model for the project.
+
+#### Tasks performed
+
+- Implementation of baseline described on [here](http://anoopsarkar.github.io/nlp-class/hw1.html).
+- Implementation of mathematical models such as unigram and bigram models for the algorithm.
+- Research and brainstorm on how to improve the speed of the algorithm of our group.
+- Testing results against `reference` file.
+- Writing LaTeX read file.
+- Planning dates, preparing and submitting files. 
+
+#### Logs
+
+| Date                | Author   | Full_message     | Hash                 |
+| :---: | :----------| :-------- | :-----------: | 
+| 2017-10-05 14:11:04 | tmosharr | Added readme: contribution and algorithm | a42e5760850d972522b75c345490a428573badc5 |
+| 2017-10-05 14:07:23 | tmosharr | Added readme: contribution and algorithm | c77a23c821b00dabe059c2e9d3f1e2d4c1f46eea |
+| 2017-10-04 11:35:02 | tmosharr | Fixed some bugs in Bigram Model| 736f08935171ca1a7b8f4430d772eda5f9d97ce2 |
+| 2017-10-02 13:16:18 | tmosharr | bigram partial error fixed, accuracy 88.53% in leaderboard | 472d55163ace9c635fd9b253896737822791f5ae |
+| 2017-10-01 12:59:23 | tmosharr | Added the Bigram Model | c98c7eaf2bd1a85af9328f6110fe57200f59ffc4 |
+| 2017-09-30 11:13:40 | tmosharr | baseline implementation, accuracy=80%, faster implementation| ce67103848d1c3c7b65da78b9f1411fe637b177a |
+| 2017-09-30 10:43:31 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel To get updated data | 082d8897e7a2beee31ce74298771eba0d8099774 |
+| 2017-09-30 10:31:32 | tmosharr | baseline implementation, accuracy=80% |1b2c587bab1a4f51d872ae5aed37f553c4d9d3ea |
+| 2017-09-29 21:08:31 | tmosharr | Now its printing, still lot to go | d637fc467fc8c281368bb5955b045bc7875b17ef |
+| 2017-09-29 20:36:19 | tmosharr | fixed small bugs | e9a1f349af76c0e8356715b836d32a8ef9bf2661 |
+| 2017-09-29 19:56:12 | tmosharr | Adding first file for Turash | 353714f496ff547870cc50b7b1b22433b9003c86 |
+
