@@ -1,5 +1,8 @@
 ## Word Segmentation - Homework 1 - CMPT 383 and CMPT 413
-> This README file constains information about the taks performed by `tmosharr` on Homework 1. The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+> This README file constains information about the taks performed by `tmosharr` on Homework 1.
+The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+
+_Obs.: All files developed/used by Turash are inside [../tmosharr/](../tmosharr). Take a look!_
 
 ### Turash Mosharraf - tmosharr
 Turash was in charge of making the baseline work as well as implementing the `bigram` model for the project.

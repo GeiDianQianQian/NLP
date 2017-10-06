@@ -1,5 +1,8 @@
 ## Word Segmentation - Homework 1 - CMPT 383 and CMPT 413
-> This README file constains information about the taks performed by `lperesde` on Homework 1. The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+> This README file constains information about the taks performed by `lperesde` on Homework 1.
+The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+
+_Obs.: All files developed/used by Luiz are inside [../lperesde/](../lperesde). Take a look!_
 
 ### Luiz Fernando Peres de Oliveira - lperesde
 Luiz was in charge of finding a better and different solution from the baseline as well as implementing it, gathering data and preparing files in order to maximize score of our project.
