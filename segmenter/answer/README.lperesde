@@ -1,0 +1,42 @@
+## Word Segmentation - Homework 1 - CMPT 383 and CMPT 413
+> This README file constains information about the taks performed by `lperesde` on Homework 1. The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+
+### Luiz Fernando Peres de Oliveira - lperesde
+Luiz was in charge of finding a better and different solution from the baseline as well as implementing it, gathering data and preparing files in order to maximize score of our project.
+
+#### Tasks performed
+
+- Setup of GitLab project
+- Implementation of a model based on a pattern matching parser (a parser that distinguishes symbols from numbers, dates and such).
+- Implementation of *argmax* algorithm in that model.
+- Parsing of file `wseg_simplified_cn` and merging with `count_1w.txt` creating then a third input file called `count_wseg_1w.txt`. 
+- Research and brainstorm on how to improve the speed of the algorithm of our group.
+- Testing results against `reference` file.
+- Writing readme files for the project. 
+
+#### Logs
+
+| Date                | Author   | Full_message     | Hash                 |
+| :---: | :----------| :-------- | :-----------: |
+| 2017-10-06 00:19:41 | Luiz Fernando Peres | Copied bigram model from Turash's folder | f514af185b33c17ca72d47c240b180291d460473 |
+| 2017-10-06 00:08:27 | Luiz Fernando Peres | Submitting folder readme | aab2af0bb25847f90820aa6892dc9863b288f16a |
+| 2017-10-05 00:27:15 | Luiz Fernando Peres | Changing basefile for 1 word counting | 40c90c8c4e7ea0409b80bd10d6631aad5fbbe9ea |
+| 2017-10-05 00:24:54 | Luiz Fernando Peres | Merging wseg and w1 all together | 4c9f2c07618557e7d105bc804e861d66689334c8 |
+| 2017-10-02 03:09:38 | Luiz Fernando Peres | Got a 45! :D | ba0f9aa7f073381e98478bda19a9db609cbbc6ae |
+| 2017-10-02 02:11:10 | Luiz Fernando Peres | Giving support to unknown words | 41cb1107c89d5143fddcc80c05255eb663524060 |
+| 2017-10-01 22:37:16 | Luiz Fernando Peres | Found a slow way of get over 30 | 7e3a7b9f16a58fcdc44872b0fd4208d437da81e7 |
+| 2017-10-01 20:16:59 | Luiz Fernando Peres | A jump from 10 to 17, 73 more to go | a6f446ab26d44fa17d04d3c6703bc659e1a1c214 |
+| 2017-10-01 16:08:31 | Luiz Fernando Peres | Merge branch 'master' of csil-git1.cs.surrey.sfu.ca:lperesde/nlpclass-1777-pixel | 04a1414646ac8a3540a34584730f2faa1b9c1c96 |
+| 2017-10-01 16:08:26 | Luiz Fernando Peres | Improving the code and checking character backwars | 4c09681d5fad10a1069c11cf6888803f21c22dfb |
+| 2017-10-01 06:52:44 | Luiz Fernando Peres | Lots of bugs still... | af332bde2d677ea1b4468da898cc5da95ea5ddae |
+| 2017-10-01 03:46:35 | Luiz Fernando Peres | Checkpoint on the case | bc6cddfb265654d48ee0e54fc312343e832d4790 |
+| 2017-10-01 02:25:52 | Luiz Fernando Peres | Code a bit better | 29d06b93fea3eb77abbf3f07e32b54e39853ce9a |
+| 2017-09-30 23:30:23 | Luiz Fernando Peres | Improving slightly the code | ec7e5b9c5978dceca73a843584592ed089ba99ba |
+| 2017-09-30 23:11:25 | Luiz Fernando Peres | Improving baseline scores | fd60b209903273bcb1994c6c489415ada9d30628 |
+| 2017-09-30 01:43:08 | Luiz Fernando Peres | Printing file reversed (in order to apply our case) | ff7832479adb7967baa6673957ced929bfecffc8 |
+| 2017-09-30 00:55:18 | Luiz Fernando Peres | Fixing wseg data and including a new file for study of case | 22adad7b082f1f8a75fd0550b23ccfdc94d55d63 |
+| 2017-09-29 23:43:32 | Luiz Fernando Peres | Creating script for wseg set in order to improve our score later | 2288fa554225c3faabb6f9efd32114964d83568e |
+| 2017-09-28 00:28:44 | Luiz Fernando Peres | Initial files for Homework 1 | a3d5e35f7d1283ce3a7702bc5ff51c18d40c87d5 |
+| 2017-09-27 22:40:56 | Luiz Fernando Peres | Updating project structure | ba8fb27ae23c2760963b7dda19433c9fee189a08 |
+| 2017-09-27 22:25:36 | Luiz Fernando Peres | Adding README files | 2d965a0695b9ad526bf03c7a562581adccc42cbb |
+
