@@ -89,6 +89,8 @@ We consider a unigram as a single word and a bigram as an ordered pair of words 
 		\hline
 		Pw[$w$] & frequency of $w$ in Pw dictionary    \\
 		\hline
+		Pwseg[$w$] & frequency of $w$ in Pwseg dictionary (extracted from wseg\_simplified\_cn)   \\
+		\hline
 		Pw2[$w_1,w_2$] & frequency of \{$w_1,w_2$\} bigram in Pw2 dictionary    \\
 		\hline
 		$V$ & Total number of different unigrams or bigrams  \\
@@ -145,7 +147,7 @@ P(w_2|w_1)=\frac{1}{(Pw[w_1]+Pw2.voc[w_1]+1)(Pw.N+Pw.V+1)}
 		\hline
 		Data Structure   & Description  \\
 		\hline
-		Pw,Pw2 & Dictionaries with frequencies of unigrams and bigrams respectively \\
+		Pw,Pwseg, Pw2 & Dictionaries with frequencies of unigrams (Pw and Pwseg) and bigrams (Pw2) \\
 		\hline
 		chart &Dynamic programming Table to store the words\\
 		\hline
@@ -168,16 +170,29 @@ The algorithm is given below:
 	\label{alg:pbg}
 	\begin{algorithmic}[1]
 		\REQUIRE File with non segmented words $Input$,\\
-		unigram dictionary $Pw$,\\ bigram dictionary $Pw_2$\\ 
+		unigram dictionary $Pw$,\\
+		unigram dictionary $Pwseg$,\\
+		bigram dictionary $Pw_2$\\ 
 		\ENSURE File with segmented words \\
 		\vspace{3pt}
 		\STATE Initialize $chart=\{\}$ and $maxlen \gets $ longest bigram length
 		\STATE Initialize priority queue with starting position as priority
 		\FOR{$l$ in  range(1,...,maxlen)}
 		\STATE $w_1 \gets$ substring input[0,...,l-1]
-		\IF {$w_1$ is found in Pw}
+		\IF {$w_1$ is number }
+		\STATE calculate $P_{number}(w_1)$ according to the calibrated probability for numbers
+		\STATE add $\{w_1,0,P_{number}[w_1],None\}$ into pq
+		\ELSIF {$w_1$ is found in Pw}
 		\STATE calculate $P(w_1)$ according to unigram model 
 		\STATE add $\{w_1,0,P[w_1],None\}$ into pq
+		\ELSIF {$w_1$ is found in Pwseg}
+		\STATE \COMMENT{ \# We trust on WSEG data 3 times less, so we multiply its probability by 3 }
+		\STATE calculate $P_{wseg}(w_1) * 3$ according to unigram model 
+		\STATE add $\{w_1,0,P_{wseg}[w_1] * 3,None\}$ into pq
+		\ELSE
+		\STATE \COMMENT{ \# We then handle unknown words }
+		\STATE calculate $P_{unknown}(w_1) * length(w_1)$ according to the calibrated probability for unknown words 
+		\STATE add $\{w_1,0,P_{unknown}[w_1] * length(w_1),None\}$ into pq		
 		\ENDIF
 		\ENDFOR
 		\IF {nothing inserted in last for loop}
