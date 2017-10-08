@@ -4,6 +4,7 @@ from Queue import PriorityQueue
 
 optparser = optparse.OptionParser()
 optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
+optparser.add_option("-d", "--uniwsegcounts", dest='countswseg', default=os.path.join('wseg_data', 'count_wseg.txt'), help="unigram wseg counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
 optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
@@ -48,10 +49,9 @@ class Entry:
         self.log_prob=log_prob
         self.back_ptr=back_ptr
 
-
-
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
+Pwseg = Pdist(opts.countswseg)
 Pw2  = Pdist(opts.counts2w)
 pq  = PriorityQueue()
 
@@ -96,6 +96,11 @@ with open(opts.input) as f:
                 inserted+=1
             elif(first_word in Pw):
                 entry=Entry(first_word,0,Pw(first_word),None)
+                pq.put((0,entry))
+                inserted+=1
+            elif(first_word in Pwseg):
+                # wseg is 3 times less reliable
+                entry=Entry(first_word,0,Pwseg(first_word) * 3,None)
                 pq.put((0,entry))
                 inserted+=1
         if(inserted==0):
