@@ -198,8 +198,16 @@ with open(opts.input) as f:
         wordlist=[]
         current_entry=chart[finalindex]
         while(current_entry!=None):
-            wordlist.append(current_entry.word)
-            current_entry=current_entry.back_ptr
+            word = ""
+            if (isNumber(word + current_entry.word)):
+                while(current_entry != None and isNumber(word + current_entry.word)):
+                    word = word + current_entry.word
+                    current_entry = current_entry.back_ptr
+            else:
+                word = current_entry.word
+                current_entry=current_entry.back_ptr
+
+            wordlist.append(word)
         wordlist.reverse()
         print " ".join(wordlist)
 sys.stdout = old
