@@ -90,11 +90,12 @@ with open(opts.input) as f:
         for allowed_length in range(1,Pw.maxlen):
             first_word=input[0:allowed_length]
             if (isNumber(first_word)):
-                numberPw = -5.00000 / len(first_word);
+                # -5 maximizes numbers
+                numberPw = -5.0000;
                 entry=Entry(first_word,0, numberPw,None)
                 pq.put((0,entry))
                 inserted+=1
-            elif(first_word in Pw):
+            if(first_word in Pw):
                 entry=Entry(first_word,0,Pw(first_word),None)
                 pq.put((0,entry))
                 inserted+=1
@@ -147,6 +148,18 @@ with open(opts.input) as f:
                         d2=int(Pw2.voc.get(prev_word,0))
                         d=math.log((d1+d2+1),2)
                         logprob = a+b-c-d
+                        next_entry = Entry(next_word, next_start, entry.log_prob + logprob, entry)
+                        pq.put((next_start, next_entry))
+                        inserted +=1
+                    elif(next_word in Pwseg):
+                        a=math.log(1, 2)
+                        b=math.log((Pwseg[next_word]+1),2)
+                        c=math.log(Pw.N+Pw.V+1)
+                        d1=Pw[prev_word]
+                        d2=int(Pw2.voc.get(prev_word,0))
+                        d=math.log((d1+d2+1),2)
+                        # we trust 3 times less
+                        logprob = (a+b-c-d) * 1.9
                         next_entry = Entry(next_word, next_start, entry.log_prob + logprob, entry)
                         pq.put((next_start, next_entry))
                         inserted +=1
