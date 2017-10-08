@@ -1,9 +1,10 @@
-
+# -*- coding: utf-8 -*-
 import sys, codecs, optparse, os, math
 from Queue import PriorityQueue
 
 optparser = optparse.OptionParser()
 optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('data', 'count_1w.txt'), help="unigram counts")
+optparser.add_option("-d", "--uniwsegcounts", dest='countswseg', default=os.path.join('data', 'count_wseg.txt'), help="unigram wseg counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('data', 'count_2w.txt'), help="bigram counts")
 optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('data', 'input'), help="input file to segment")
 (opts, _) = optparser.parse_args()
@@ -48,10 +49,9 @@ class Entry:
         self.log_prob=log_prob
         self.back_ptr=back_ptr
 
-
-
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
+Pwseg = Pdist(opts.countswseg)
 Pw2  = Pdist(opts.counts2w)
 pq  = PriorityQueue()
 
@@ -62,6 +62,17 @@ sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
 input=""
 count=0
 
+def isNumber(x):
+    idx = 0
+    if (idx < len(x) and x[idx] >= u'\uFF10' and x[idx] <= u'\uFF19'):
+        idx += 1
+        while (idx < len(x) and ((x[idx] >= u'\uFF10' and x[idx] <= u'\uFF19')
+            or (x[idx] == "·".decode('utf-8')))):
+            idx += 1
+
+        return idx == len(x)
+    # if is between 0 and 9 or has a separator
+    return False
 
 with open(opts.input) as f:
 
@@ -78,8 +89,24 @@ with open(opts.input) as f:
         inserted=0
         for allowed_length in range(1,Pw.maxlen):
             first_word=input[0:allowed_length]
-            if(first_word in Pw):
+            if (isNumber(first_word)):
+                # -5 maximizes numbers
+                numberPw = -5.0000;
+                entry=Entry(first_word,0, numberPw,None)
+                pq.put((0,entry))
+                inserted+=1
+            elif(first_word in Pw):
                 entry=Entry(first_word,0,Pw(first_word),None)
+                pq.put((0,entry))
+                inserted+=1
+            elif(first_word in Pwseg):
+                # wseg is 3 times less reliable
+                entry=Entry(first_word,0,Pwseg(first_word) * 3,None)
+                pq.put((0,entry))
+                inserted+=1
+            else:
+                # unknown words should have a weight
+                entry=Entry(first_word,0,-31 * len(first_word),None)
                 pq.put((0,entry))
                 inserted+=1
         if(inserted==0):
@@ -129,6 +156,18 @@ with open(opts.input) as f:
                         next_entry = Entry(next_word, next_start, entry.log_prob + logprob, entry)
                         pq.put((next_start, next_entry))
                         inserted +=1
+                    elif(next_word in Pwseg):
+                        a=math.log(1, 2)
+                        b=math.log((Pwseg[next_word]+1),2)
+                        c=math.log(Pw.N+Pw.V+1)
+                        d1=Pw[prev_word]
+                        d2=int(Pw2.voc.get(prev_word,0))
+                        d=math.log((d1+d2+1),2)
+                        # we trust 3 times less
+                        logprob = (a+b-c-d) * 1.9
+                        next_entry = Entry(next_word, next_start, entry.log_prob + logprob, entry)
+                        pq.put((next_start, next_entry))
+                        inserted +=1
                     else:
                         continue
                 if ((inserted == 0) and (next_start <= finalindex)):
@@ -159,8 +198,16 @@ with open(opts.input) as f:
         wordlist=[]
         current_entry=chart[finalindex]
         while(current_entry!=None):
-            wordlist.append(current_entry.word)
-            current_entry=current_entry.back_ptr
+            word = ""
+            if (isNumber(current_entry.word + word)):
+                while(current_entry != None and isNumber(current_entry.word + word)):
+                    word = current_entry.word + word
+                    current_entry = current_entry.back_ptr
+            else:
+                word = current_entry.word
+                current_entry=current_entry.back_ptr
+
+            wordlist.append(word)
         wordlist.reverse()
         print " ".join(wordlist)
 sys.stdout = old
