@@ -166,7 +166,7 @@ The algorithm is given below:
 \begin{algorithm}[htb]
 	\renewcommand{\algorithmicrequire}{\textbf{Input:}\hspace{10.7pt}}
 	\renewcommand\algorithmicensure {\textbf{Output:} }
-	\caption{Word Segmentation}
+	\caption{Word Segmentation - Part 1}
 	\label{alg:pbg}
 	\begin{algorithmic}[1]
 		\REQUIRE File with non segmented words $Input$,\\
@@ -200,6 +200,12 @@ The algorithm is given below:
 		\STATE calculate $P(w_1)$ according to unigram model  
 		\STATE add $\{w_1,0,Pw[w_1],None\}$ into pq
 		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htb]
+	\begin{algorithmic}[1]
+
 		\WHILE{pq not empty}
 		\STATE $item \gets$ highest priority item from pq
 		\STATE $end \gets item.length+item.start$ 
@@ -244,9 +250,6 @@ The algorithm is given below:
 		\STATE print wordlist in reverse order
 	\end{algorithmic}
 \end{algorithm}
-
-
-
 
 
 \end{document}
