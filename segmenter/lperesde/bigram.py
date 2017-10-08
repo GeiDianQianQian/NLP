@@ -199,9 +199,9 @@ with open(opts.input) as f:
         current_entry=chart[finalindex]
         while(current_entry!=None):
             word = ""
-            if (isNumber(word + current_entry.word)):
-                while(current_entry != None and isNumber(word + current_entry.word)):
-                    word = word + current_entry.word
+            if (isNumber(current_entry.word + word)):
+                while(current_entry != None and isNumber(current_entry.word + word)):
+                    word = current_entry.word + word
                     current_entry = current_entry.back_ptr
             else:
                 word = current_entry.word
