@@ -95,13 +95,18 @@ with open(opts.input) as f:
                 entry=Entry(first_word,0, numberPw,None)
                 pq.put((0,entry))
                 inserted+=1
-            if(first_word in Pw):
+            elif(first_word in Pw):
                 entry=Entry(first_word,0,Pw(first_word),None)
                 pq.put((0,entry))
                 inserted+=1
             elif(first_word in Pwseg):
                 # wseg is 3 times less reliable
                 entry=Entry(first_word,0,Pwseg(first_word) * 3,None)
+                pq.put((0,entry))
+                inserted+=1
+            else:
+                # unknown words should have a weight
+                entry=Entry(first_word,0,-31 * len(first_word),None)
                 pq.put((0,entry))
                 inserted+=1
         if(inserted==0):
