@@ -1,2 +1,6 @@
 *.swp
+*.aux
+*.log
 wseg_simplified_cn
+output*
+*.synctex.*
