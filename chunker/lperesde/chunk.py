@@ -2,7 +2,7 @@
 
 You have to write the perc_train function that trains the feature weights using the perceptron algorithm for the CoNLL 2000 chunking task.
 
-Each element of train_data is a (labeled_list, feat_list) pair. 
+Each element of train_data is a (labeled_list, feat_list) pair.
 
 Inside the perceptron training loop:
 
@@ -71,8 +71,8 @@ def perc_train(train_data, tagset, numepochs):
                 for f in feats_for_this_word:
                     wrongkey = f, argmax
                     rightkey = f, tru
-                    feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
-                    feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
+                    feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 10
+                    feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 10
                 i += 1
             i = 0
 
@@ -95,8 +95,8 @@ def perc_train(train_data, tagset, numepochs):
                     truprev += truetags[i - 1]
                 wrongkey = argmaxprev, argmax
                 rightkey = truprev, tru
-                feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
-                feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
+                feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 10
+                feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 10
                 i += 1
             #if(sen%1000==0):
                 #print(str(sen)+"/"+str(len(train_data)))
@@ -128,4 +128,3 @@ if __name__ == '__main__':
     print >>sys.stderr, "done."
     feat_vec = perc_train(train_data, tagset, int(opts.numepochs))
     perc.perc_write_to_file(feat_vec, opts.modelfile)
-
