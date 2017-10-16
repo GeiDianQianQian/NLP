@@ -5,3 +5,8 @@
 
   - [README.lperesde](./segmenter/answer/README.lperesde)
   - [README.tmosharr](./segmenter/answer/README.tmosharr)
+
+### Homework 2 - Phrasal Chunking
+  - [README.lperesde](./chunker/answer/README.lperesde)
+  - [README.tmosharr](./chunker/answer/README.tmosharr)
+
