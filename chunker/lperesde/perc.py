@@ -117,7 +117,6 @@ def perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag):
             # sum up the weights for all features except the bigram features
             for feat in feats:
                 if feat == 'B': has_bigram_feat = True
-                #print(str(feat) + "," + str(tag))
                 if (feat, tag) in feat_vec:
                     weight += feat_vec[feat, tag]
                     #print >>sys.stderr, "feat:", feat, "tag:", tag, "weight:", feat_vec[feat, tag]
@@ -128,7 +127,6 @@ def perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag):
                 prev_tag_weight = weight
                 if has_bigram_feat:
                     prev_tag_feat = "B:" + prev_tag
-                    #print(str(prev_tag_feat) + "," + str(tag))
                     if (prev_tag_feat, tag) in feat_vec:
                         prev_tag_weight += feat_vec[prev_tag_feat, tag]
                 prev_list.append( (prev_tag_weight + prev_value, prev_tag) )
@@ -147,7 +145,7 @@ def perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag):
         output.insert(0,best_tag)
         (value, backpointer) = viterbi[i][best_tag]
         best_tag = backpointer
-    #print(output)
+
     return output
 
 def conll_format(output, labeled_list):
@@ -170,11 +168,9 @@ def perc_testall(feat_vec, data, tagset):
         raise ValueError("Empty tagset")
     default_tag = tagset[0]
     for (labeled_list, feat_list) in data:
-        #print(labeled_list)
-        #print(feat_list)
         output = perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)
-        #print "\n".join(conll_format(output, labeled_list))
-        #print
+        print "\n".join(conll_format(output, labeled_list))
+        print
 
 def perc_read_from_file(filename):
     import pickle
@@ -195,8 +191,8 @@ def perc_write_to_file(feat_vec, filename):
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
     optparser.add_option("-t", "--tagsetfile", dest="tagsetfile", default=os.path.join("data", "tagset.txt"), help="tagset that contains all the labels produced in the output, i.e. the y in \phi(x,y)")
-    optparser.add_option("-i", "--inputfile", dest="inputfile", default=os.path.join("data", "small.test"), help="input data, i.e. the x in \phi(x,y)")
-    optparser.add_option("-f", "--featfile", dest="featfile", default=os.path.join("data", "small.test.feats"), help="precomputed features for the input data, i.e. the values of \phi(x,_) without y")
+    optparser.add_option("-i", "--inputfile", dest="inputfile", default=os.path.join("data", "input.txt.gz"), help="input data, i.e. the x in \phi(x,y)")
+    optparser.add_option("-f", "--featfile", dest="featfile", default=os.path.join("data", "input.feats.gz"), help="precomputed features for the input data, i.e. the values of \phi(x,_) without y")
     optparser.add_option("-m", "--modelfile", dest="modelfile", default=os.path.join("data", "default.model"), help="weights for all features stored on disk")
     (opts, _) = optparser.parse_args()
 
@@ -211,8 +207,5 @@ if __name__ == '__main__':
     test_data = read_labeled_data(opts.inputfile, opts.featfile)
     print >>sys.stderr, "done."
     feat_vec = perc_read_from_file(opts.modelfile)
-    #print(feat_vec)
-    #print(test_data)
-    #print(tagset)
     perc_testall(feat_vec, test_data, tagset)
 
