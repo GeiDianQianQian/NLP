@@ -5,7 +5,7 @@ Check the [`README.lperesde`](../answer/README.lperesde) for information about t
 ##### Table of contents:
   - [./data/](#data)
   - [default.py](#defaultpy)
-  - [chunky.py](#chunkypy)
+  - [chunk.py](#chunkpy)
   - [perc.py](#percpy)
   - [score-chunk.py](score-chunkpy)
   - Model files
@@ -17,7 +17,7 @@ Data given by staff for project baseline.
 ###### default.py
 The default script given for this project.
 
-###### chunky.py
+###### chunk.py
 The actual file with the algorithm for finding weights.
 
 ###### perc.py
