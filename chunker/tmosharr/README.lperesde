@@ -1,0 +1,29 @@
+## Phrasal Chunking - Homework 2 - CMPT 825, CMPT 383 and CMPT 413
+> This README file constains information about the taks performed by `lperesde` on Homework 2.
+The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [description_algorithm.pdf](description_algorithm.pdf)
+
+### Luiz Fernando Peres de Oliveira - lperesde
+Luiz was in charge of trying to improve the baseline as well as implementing it, as well as writing the documentation.
+
+#### Tasks performed
+
+- Setup of GitLab project
+- Research and brainstorm on how to improve the speed of the algorithm of our group.
+- Testing results against given references.
+- Writing documentation for the project.
+
+#### Logs
+
+| Date                | Author   | Full Message     | Hash                 |
+| :---: | :----------| :-------- | :-----------: | 
+| 2017-10-18 23:37:45 | Luiz Fernando Peres | Creating documentation for the project as well as setting answer folder | ae15e00ff98f25fa4b8cc976ebd5a34d650976fa |
+| 2017-10-18 23:07:45 | Luiz Fernando Peres | Added README files | dd2804bb4d71036d5b3014c4b720d1fa596d37a3 |
+| 2017-10-15 23:03:32 | Luiz Fernando Peres | Trying to improve the weights by choosing random models | 3abcfa8266bcf8cdc886d2a928d99c97c0d7abac |
+| 2017-10-15 22:50:01 | Luiz Fernando Peres | New files related to the chunker | 8fe7f6b64f2dc466a5afc5c6e2e9fa554b2f6289 |
+| 2017-10-15 20:46:30 | Luiz Fernando Peres | Preparing README files | efc58382b034c4c91db0ac108290430a5dd3c5d2 |
+| 2017-10-15 20:43:39 | Luiz Fernando Peres | Added folder for the chunker | de7c4d7047da9c8f75bf88bdd42952ea8251c079 |
+| 2017-10-13 17:16:24 | Luiz Fernando Peres | Adding initial files for chunker | f7f26ac79b1e0763bc2e0ddf18e2a3288ea248df |
+| 2017-10-08 02:04:12 | Luiz Fernando Peres | Including file to the root folder of project | bc7f6d96a08d6826771a1320616d1493665b7b11 |
+| 2017-10-08 01:59:31 | Luiz Fernando Peres | PDF and tex file updated | 8e1bd0c1a2a4cb707e3084abf9a220c4d6ffac29 |
+| 2017-10-08 01:41:23 | Luiz Fernando Peres | First version of improved algorithm | 43ea54e28a2b14932a8ebb7aea922f0e6ede7f22 |
+

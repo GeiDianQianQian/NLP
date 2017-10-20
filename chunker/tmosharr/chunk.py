@@ -35,84 +35,231 @@ from collections import defaultdict
 def perc_train(train_data, tagset, numepochs):
     feat_vec = defaultdict(int)
     # insert your code here
+    cumulative_feat_vec=defaultdict(float)
+    index_dec=dict()
     epoch = 0
-
+    count = 0
+    numsen = len(train_data)
     while (epoch < numepochs):
-        #print(epoch)
+        print(epoch)
         mistakes = 0
         correct = 0
-        #print(len(train_data))
-        #sen=0
+        #print(numsen)
+        sen=0
         for sentence_data in train_data:
-            words = []
-            postags = []
-            truetags = []
-            label_list = sentence_data[0]
-            feat_list = sentence_data[1]
-            for label in label_list:
-                (word, postag, chunktag) = label.split(" ")
-                words.append(word)
-                postags.append(postag)
-                truetags.append(chunktag)
-            tagset = perc.read_tagset(opts.tagsetfile)
-            default_tag = tagset[0]
-            argmaxtags = perc.perc_test(feat_vec, label_list, feat_list, tagset, default_tag)
-            feat_index = 0
-            i = 0
+            if(epoch!=numepochs or sen!=numsen):
 
-            for word in words:
-                (feat_index, feats_for_this_word) = perc.feats_for_word(feat_index, feat_list)
-                # print(len(feats_for_this_word))
-                argmax = argmaxtags[i]
-                tru = truetags[i]
-                if (argmax == tru):
+                words = []
+                postags = []
+                truetags = []
+                label_list = sentence_data[0]
+                feat_list = sentence_data[1]
+                for label in label_list:
+                    (word, postag, chunktag) = label.split(" ")
+                    words.append(word)
+                    postags.append(postag)
+                    truetags.append(chunktag)
+                tagset = perc.read_tagset(opts.tagsetfile)
+                default_tag = tagset[0]
+                argmaxtags = perc.perc_test(feat_vec, label_list, feat_list, tagset, default_tag)
+                feat_index = 0
+                i = 0
+
+                for word in words:
+                    (feat_index, feats_for_this_word) = perc.feats_for_word(feat_index, feat_list)
+                    # print(len(feats_for_this_word))
+                    argmax = argmaxtags[i]
+                    tru = truetags[i]
+                    if (argmax == tru):
+                        i += 1
+                        continue
+                    for f in feats_for_this_word:
+                        wrongkey = f, argmax
+                        rightkey = f, tru
+                        if(wrongkey in index_dec):
+                            (index_epoch,index_sen)=index_dec[wrongkey]
+                            idletime=(epoch*numsen + sen - index_epoch*numsen - index_sen)
+                            cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec.get(wrongkey, 0)*idletime
+                        if (rightkey in index_dec):
+                            (index_epoch, index_sen) = index_dec[rightkey]
+                            idletime = (epoch*numsen + sen - index_epoch*numsen - index_sen)
+                            cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec.get(rightkey,0) *idletime
+
+                        feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
+                        feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
+                        cumulative_feat_vec[wrongkey]=cumulative_feat_vec.get(wrongkey,0)+feat_vec[wrongkey]
+                        cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec[rightkey]
+                        index_dec[wrongkey]=(epoch,sen)
+                        index_dec[rightkey]=(epoch,sen)
                     i += 1
-                    continue
-                for f in feats_for_this_word:
-                    wrongkey = f, argmax
-                    rightkey = f, tru
+                i = 0
+
+                for word in words:
+                    argmax = argmaxtags[i]
+                    tru = truetags[i]
+                    if (argmax == tru):
+                        i += 1
+                        correct += 1
+                        continue
+                    else:
+                        mistakes += 1
+                    argmaxprev = "B:"
+                    truprev = "B:"
+                    if (i == 0):
+                        argmaxprev += "B_-1"
+                        truprev += "B_-1"
+                    else:
+                        argmaxprev += argmaxtags[i - 1]
+                        truprev += truetags[i - 1]
+                    wrongkey = argmaxprev, argmax
+                    rightkey = truprev, tru
+
+                    if (wrongkey in index_dec):
+                        (index_epoch, index_sen) = index_dec[wrongkey]
+                        idletime = (epoch * numsen + sen - index_epoch * numsen - index_sen)
+                        cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec.get(wrongkey,0)*idletime
+
+                    if (rightkey in index_dec):
+                        (index_epoch, index_sen) = index_dec[rightkey]
+                        idletime = (epoch * numsen + sen - index_epoch * numsen - index_sen)
+                        cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec.get(rightkey,0)*idletime
+
+
                     feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
                     feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
-                i += 1
-            i = 0
-
-            for word in words:
-                argmax = argmaxtags[i]
-                tru = truetags[i]
-                if (argmax == tru):
+                    cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec[wrongkey]
+                    cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec[rightkey]
+                    index_dec[wrongkey] = (epoch, sen)
+                    index_dec[rightkey] = (epoch, sen)
                     i += 1
-                    correct += 1
-                    continue
-                else:
-                    mistakes += 1
-                argmaxprev = "B:"
-                truprev = "B:"
-                if (i == 0):
-                    argmaxprev += "B_-1"
-                    truprev += "B_-1"
-                else:
-                    argmaxprev += argmaxtags[i - 1]
-                    truprev += truetags[i - 1]
-                wrongkey = argmaxprev, argmax
-                rightkey = truprev, tru
-                feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
-                feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
-                i += 1
-            #if(sen%1000==0):
-                #print(str(sen)+"/"+str(len(train_data)))
-            #sen+=1
+
+                #keys=feat_vec.keys()
+                #for key in keys:
+                    #cumulative_feat_vec[key]=cumulative_feat_vec.get(key,0)+feat_vec[key]
+                count+=1
+            else:
+
+                words = []
+                postags = []
+                truetags = []
+                label_list = sentence_data[0]
+                feat_list = sentence_data[1]
+                for label in label_list:
+                    (word, postag, chunktag) = label.split(" ")
+                    words.append(word)
+                    postags.append(postag)
+                    truetags.append(chunktag)
+                tagset = perc.read_tagset(opts.tagsetfile)
+                default_tag = tagset[0]
+                argmaxtags = perc.perc_test(feat_vec, label_list, feat_list, tagset, default_tag)
+                feat_index = 0
+                i = 0
+
+                for word in words:
+                    (feat_index, feats_for_this_word) = perc.feats_for_word(feat_index, feat_list)
+                    # print(len(feats_for_this_word))
+                    argmax = argmaxtags[i]
+                    tru = truetags[i]
+                    for f in feats_for_this_word:
+                        wrongkey = f, argmax
+                        rightkey = f, tru
+
+                        (index_epoch, index_sen) = index_dec[wrongkey]
+                        idletime = (epoch*numsen + sen - index_epoch*numsen - index_sen)
+                        cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec.get(wrongkey, 0)*idletime
+
+
+                        (index_epoch, index_sen) = index_dec[rightkey]
+                        idletime = (epoch*numsen + sen - index_epoch*numsen - index_sen)
+                        cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec.get(rightkey, 0)*idletime
+
+
+                    if (argmax == tru):
+                        i += 1
+                        continue
+                    for f in feats_for_this_word:
+                        wrongkey = f, argmax
+                        rightkey = f, tru
+
+                        feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
+                        feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
+                        cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec[wrongkey]
+                        cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec[rightkey]
+                        index_dec[wrongkey] = (epoch, sen)
+                        index_dec[rightkey] = (epoch, sen)
+                    i += 1
+                i = 0
+
+                for word in words:
+                    argmax = argmaxtags[i]
+                    tru = truetags[i]
+
+                    argmaxprev = "B:"
+                    truprev = "B:"
+                    if (i == 0):
+                        argmaxprev += "B_-1"
+                        truprev += "B_-1"
+                    else:
+                        argmaxprev += argmaxtags[i - 1]
+                        truprev += truetags[i - 1]
+                    wrongkey = argmaxprev, argmax
+                    rightkey = truprev, tru
+
+                    (index_epoch, index_sen) = index_dec[wrongkey]
+                    idletime = (epoch * numsen + sen - index_epoch * numsen - index_sen)
+                    cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec.get(wrongkey,0) * idletime
+
+
+                    (index_epoch, index_sen) = index_dec[rightkey]
+                    idletime = (epoch * numsen + sen - index_epoch * numsen - index_sen)
+                    cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec.get(rightkey,0) * idletime
+
+
+                    if (argmax == tru):
+                        i += 1
+                        correct += 1
+                        continue
+                    else:
+                        mistakes += 1
+
+
+
+                    feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
+                    feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
+                    cumulative_feat_vec[wrongkey] = cumulative_feat_vec.get(wrongkey, 0) + feat_vec[wrongkey]
+                    cumulative_feat_vec[rightkey] = cumulative_feat_vec.get(rightkey, 0) + feat_vec[rightkey]
+                    index_dec[wrongkey] = (epoch, sen)
+                    index_dec[rightkey] = (epoch, sen)
+                    i += 1
+
+                # keys=feat_vec.keys()
+                # for key in keys:
+                    # cumulative_feat_vec[key]=cumulative_feat_vec.get(key,0)+feat_vec[key]
+                count += 1
+
+
+            if(sen%1000==0):
+                print(str(sen)+"/"+str(len(train_data)))
+            sen+=1
+
         #print(mistakes)
         #print(correct)
         epoch += 1
+
+    keys = cumulative_feat_vec.keys()
+    for key in keys:
+        cumulative_feat_vec[key] = float(cumulative_feat_vec[key])/float(count)
+
     # please limit the number of iterations of training to n iterations
-    return feat_vec
+
+    return cumulative_feat_vec
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
     optparser.add_option("-t", "--tagsetfile", dest="tagsetfile", default=os.path.join("data", "tagset.txt"), help="tagset that contains all the labels produced in the output, i.e. the y in \phi(x,y)")
     optparser.add_option("-i", "--trainfile", dest="trainfile", default=os.path.join("data", "train.txt.gz"), help="input data, i.e. the x in \phi(x,y)")
     optparser.add_option("-f", "--featfile", dest="featfile", default=os.path.join("data", "train.feats.gz"), help="precomputed features for the input data, i.e. the values of \phi(x,_) without y")
-    optparser.add_option("-e", "--numepochs", dest="numepochs", default=int(3), help="number of epochs of training; in each epoch we iterate over over all the training examples")
+    optparser.add_option("-e", "--numepochs", dest="numepochs", default=int(10), help="number of epochs of training; in each epoch we iterate over over all the training examples")
     optparser.add_option("-m", "--modelfile", dest="modelfile", default=os.path.join("data", "default.model"), help="weights for all features stored on disk")
     (opts, _) = optparser.parse_args()
 
