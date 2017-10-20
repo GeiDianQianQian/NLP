@@ -1,8 +1,7 @@
-## Phrasal Chunking - Homework 2 - CMPT 383 and CMPT 413
+## Phrasal Chunking - Homework 2 - CMPT 825, CMPT 383 and CMPT 413
 > This README file constains information about the taks performed by `tmosharr` on Homework 2.
-The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [./theory/description_algorithm.pdf](theory/description_algorithm.pdf)
+The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [description_algorithm.pdf](description_algorithm.pdf)
 
-_Obs.: All files developed/used by Turash are inside [tmosharr GitLab's folder](https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel/tree/master/chunker/tmosharr). Take a look!_
 
 ### Turash Mosharraf - tmosharr
 Turash was in charge of making the baseline work for the project.

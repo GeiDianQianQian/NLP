@@ -2,7 +2,7 @@
 
 You have to write the perc_train function that trains the feature weights using the perceptron algorithm for the CoNLL 2000 chunking task.
 
-Each element of train_data is a (labeled_list, feat_list) pair. 
+Each element of train_data is a (labeled_list, feat_list) pair.
 
 Inside the perceptron training loop:
 
@@ -35,14 +35,15 @@ from collections import defaultdict
 def perc_train(train_data, tagset, numepochs):
     feat_vec = defaultdict(int)
     # insert your code here
+    cumulative_feat_vec=defaultdict(float)
     epoch = 0
-
+    count = 0
     while (epoch < numepochs):
-        #print(epoch)
+        print(epoch)
         mistakes = 0
         correct = 0
         #print(len(train_data))
-        #sen=0
+        sen=0
         for sentence_data in train_data:
             words = []
             postags = []
@@ -98,14 +99,27 @@ def perc_train(train_data, tagset, numepochs):
                 feat_vec[wrongkey] = feat_vec.get(wrongkey, 0) - 1
                 feat_vec[rightkey] = feat_vec.get(rightkey, 0) + 1
                 i += 1
-            #if(sen%1000==0):
-                #print(str(sen)+"/"+str(len(train_data)))
-            #sen+=1
+
+            keys=feat_vec.keys()
+            for key in keys:
+                cumulative_feat_vec[key]=cumulative_feat_vec.get(key,0)+feat_vec[key]
+            count+=1
+
+            if(sen%1000==0):
+                print(str(sen)+"/"+str(len(train_data)))
+            sen+=1
+
         #print(mistakes)
         #print(correct)
         epoch += 1
+
+    keys = cumulative_feat_vec.keys()
+    for key in keys:
+        cumulative_feat_vec[key] = float(cumulative_feat_vec[key])/float(count)
+
     # please limit the number of iterations of training to n iterations
-    return feat_vec
+
+    return cumulative_feat_vec
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
