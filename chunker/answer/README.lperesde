@@ -22,7 +22,13 @@ Luiz was in charge of trying to improve the baseline as well as implementing it,
 #### Logs
 
 | Date                | Author   | Full Message     | Hash                 |
-| :---: | :----------| :-------- | :-----------: | 
+| :---: | :----------| :-------- | :-----------: |
+| 2017-10-20 17:05:14 | Luiz Fernando Peres | Added instructions to download answer dependencies | 253e3e73d6ea2641a96a5ee1a9a7f67afca1ec22 |
+| 2017-10-20 16:42:07 | Luiz Fernando Peres | Updating file structure for submission | 3262392fa2ee67efd3330f91c57fd673b8ba5516 |
+| 2017-10-20 02:25:01 | Luiz Fernando Peres | Merge branch 'master' of csil-git1.cs.surrey.sfu.ca:lperesde/nlpclass-1777-pixel | b0a22d47a7ca78e3ee525d39381b5754f4d72c7|
+| 2017-10-20 02:24:50 | Luiz Fernando Peres | Including small intro about perceptron algorithm | ae437c8097e15c5a3d87b0daa1cd24faea856dbd |
+| 2017-10-19 01:40:20 | Luiz Fernando Peres | LaTeX file started, still need to finish | 6e37aca8cb1cac787f05093b56642ed88d940634 |
+| 2017-10-18 23:41:33 | Luiz Fernando Peres | Updatings lperesde readme file | 8a695ffbab486bbdf985c153a965253bce0a6c81 |
 | 2017-10-18 23:37:45 | Luiz Fernando Peres | Creating documentation for the project as well as setting answer folder | ae15e00ff98f25fa4b8cc976ebd5a34d650976fa |
 | 2017-10-18 23:07:45 | Luiz Fernando Peres | Added README files | dd2804bb4d71036d5b3014c4b720d1fa596d37a3 |
 | 2017-10-15 23:03:32 | Luiz Fernando Peres | Trying to improve the weights by choosing random models | 3abcfa8266bcf8cdc886d2a928d99c97c0d7abac |

@@ -23,7 +23,12 @@ Turash was in charge of making the baseline work for the project.
 #### Logs
 
 | Date                | Author   | Full Message     | Hash                 |
-| :---: | :----------| :-------- | :-----------: | 
+| :---: | :----------| :-------- | :-----------: |
+| 2017-10-20 17:27:47 | tmosharr | Fixed readme | 0ccd7417e0939add5828a8069e37784b193591b5 |
+| 2017-10-20 06:58:10 | tmosharr | implemented average perceptron. accuracy increased to 93.6 | 8e7041d402f8df452914f0a5684c6651325c41ff |
+| 2017-10-20 06:53:04 | tmosharr | implemented average perceptron. accuracy increased to 93.6 | 84cf4abcbc5eb6d2f2aa5f76d2720bd939317447 |
+| 2017-10-20 06:49:17 | tmosharr | implemented average perceptron. accuracy increased to 93.6 | 6889f2cf946881543b80b214ee94601bc2cf88be |
+| 2017-10-19 23:50:41 | tmosharr | accuracy increased to 92.7 | ad96fbdfbf6f6458cacb937f621caa09468f3405 |
 | 2017-10-14 11:48:57 | tmosharr | implemented baseline improved, accuracy 92% | 52bc82da269f1ad05a1abebe473e630dc683f07c |
 | 2017-10-14 11:03:39 | tmosharr | implemented baseline, accuracy 91% | c0b4539ea6bc82b6e56f2eec7be89209996e483e |
 | 2017-10-13 19:00:37 | tmosharr | creating different working directory | 6284453c96afdd971ecd346f3b937b3775bafd8c |
