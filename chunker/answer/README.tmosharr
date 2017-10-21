@@ -6,8 +6,7 @@ The description of the mathematical models and algorithm used can be read on fil
 The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
 
 - Download dependency files: [nlp-hw2-dependencies.zip](https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc)
-  - Mac: `curl https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc -o nlp-hw2-dependencies.zip`
-  - Linux `wget https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc -o nlp-hw2-dependencies.zip`
+  - Execute: `curl -L -o nlp-hw2-dependencies.zip 'https://drive.google.com/uc?export=download&id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc'`
 
 ### Turash Mosharraf - tmosharr
 Turash was in charge of making the baseline work for the project.
