@@ -79,7 +79,7 @@
 %send to : HW3Subm.43vjts2a9ie04m7x@u.box.com
 \question{A}{Theory} 
 
-The algorithm used on this assignment was the \textbf{Perceptron} algorithm for Hidden Markov Model (as described on Homework 2). The Perceptron algorithm is a type of linear classifier that makes predictions based on a function (also called predictor) that combines a set of weights with the feature vector. The details of our implementation is given on the section below.
+The algorithm used on this assignment was the \textbf{averaged perceptron} learning algorithm (as described on \textit{pg. 36, Sarkar 2011.}). The algorithm is a type of linear classifier that makes predictions based on a predictor function that combines a set of weights with the feature vector and outputs the averaged weight parameter vector. The details of our implementation is given on the section below.
 
 \question{B}{Algorithm} 
 
@@ -93,12 +93,10 @@ The algorithm for the weight vector update is given below:
 		\begin{algorithmic}[1]
 		\vspace{3pt}
 		\REQUIRE
-		Tagset file $tagsetfile$\\
-		Train data $train\_data$,\\
-		Set of tags $tagset$,\\
-		Number of epochs of the algorithm $numepochs$\\
+		Tagset file `$tagsetfile$`, Train data $train\_data$, Set of tags $tagset$ and \# of epochs of the algorithm $numepochs$\\
 		\ENSURE Featured weight vector \\
-		\STATE initialize $feat\_vector$ with zeroes
+		\STATE initialize $feat\_vector$ and $cumulative\_feat\_vec$ with zeroes
+		\STATE initialize $epoch$ and $count$ with zero
 		\WHILE{$epoch$ is less than $numepoch$}
 		  \STATE initialize $mistakes$ and $correct$ with zero
 		  \FOR{$sentence\_data$ in $train\_data$}
@@ -106,12 +104,9 @@ The algorithm for the weight vector update is given below:
 		    \STATE initialize $label\_list$ as $sentence\_data[0]$ and $feat\_list$ as $sentence\_data[1]$	    	
 		    \FOR{$label$ in $label\_list$}
 		      \STATE \textbf{split} $label$ by \textit{spaces} and assign it to a triple $(word, postag, chunktag$ 
-		      \STATE append $word$ to $words$ list
-		      \STATE append $postag$ to $postags$ list
-		      \STATE append $chunktag$ to $truetags$ list
+		      \STATE append $word$ to $words$ list, $postag$ to $postags$ list and $chunktag$ to $truetags$ list
 		    \ENDFOR		    
-		    \STATE initialize $tagset$ with content of $tagsetfile$
-		    \STATE initialize $default\_tag$ as $tagset[0]$
+		    \STATE initialize $tagset$ with $tagsetfile$ and $default\_tag$ as $tagset[0]$
 		    \STATE initialize $argmaxtags$ as the result of $perc\_test$ passing $feat\_vec$, $label\_list$, $feat\_list$, $tagset$ and $default\_tag$ as params.
 		    \STATE initialize $feat\_index$ and $i$ as zero
 		    \FOR{$word$ in $words$}
@@ -122,8 +117,7 @@ The algorithm for the weight vector update is given below:
 		      \ENDIF
 		      \FOR{$f$ in $feats\_for\_this\_word$}
 		        \STATE initialize $wrongkey$ with tuple $(f, argmax)$ and $rightkey$ with tuple $(f, tru)$
-		        \STATE decrement value of $feat\_vec[wrongkey]$
-		        \STATE increment value of $feat\_vec[rightkey]$
+		        \STATE decrement value of $feat\_vec[wrongkey]$ and increment value of $feat\_vec[rightkey]$
 		      \ENDFOR
 		      \STATE increment $i$
 		    \ENDFOR
@@ -131,8 +125,7 @@ The algorithm for the weight vector update is given below:
 		    \FOR{$word$ in $words$}
 		      \STATE initialize $arg\_max$ with $argmaxtags[i]$ and $tru$ with $truetags[i]$
 		      \IF{argamax equal tru}
-		        \STATE increment $correct$
-		        \STATE increment $i$ and go back to next loop iteration
+		        \STATE increment $correct$ and increment $i$. Then, go back to next loop iteration
 		      \ELSE
 		        \STATE increment $mistakes$		      
 		      \ENDIF
@@ -143,25 +136,21 @@ The algorithm for the weight vector update is given below:
 		        \STATE concatenate $argmaxprev$ with $argmaxtags[i-1]$ and $truprev$ with $truetags[i-1]$
 		      \ENDIF
 		      \STATE initialize $wrongkey$ with tuple $(f, argmax)$ and $rightkey$ with tuple $(f, tru)$
-		      \STATE decrement value of $feat\_vec[wrongkey]$
-		      \STATE increment value of $feat\_vec[rightkey]$
+		      \STATE decrement value of $feat\_vec[wrongkey]$ and increment value of $feat\_vec[rightkey]$
 		      \STATE increment i
 		    \ENDFOR
+		    \FOR{$key$ in $feat\_vec.keys$}
+		      \STATE set $cumulative\_feat\_vec[key]$ to the value of $cumulative\_feat\_vec[key]$ + $feat\_vec[key]$
+		    \ENDFOR
+		    \STATE increment count
 		  \ENDFOR
 		  \STATE increment $epoch$
 		\ENDWHILE
-		
-		\STATE return $feat\_vec$
+		\FOR{$key$ in $cumulative\_feat\_vec$}
+		  \STATE set $cumulative\_feat\_vec[key]$ = $cumulative\_feat\_vec[key]$/$count$
+		\ENDFOR
+		\STATE return $cumulative\_feat\_vec$
 	\end{algorithmic}
 \end{algorithm}
 
 \end{document}
-
-            #if(sen%1000==0):
-                #print(str(sen)+"/"+str(len(train_data)))
-            #sen+=1
-        #print(mistakes)
-        #print(correct)
-        epoch += 1
-    # please limit the number of iterations of training to n iterations
-    return feat_vec
