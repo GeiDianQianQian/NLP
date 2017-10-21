@@ -7,7 +7,7 @@ The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 
 
 - Download dependency files: [nlp-hw2-dependencies.zip](https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc)
   - Mac: `curl https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc -o nlp-hw2-dependencies.zip`
-  - Linux `wget https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc`
+  - Linux `wget https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc -o nlp-hw2-dependencies.zip`
 
 ### Luiz Fernando Peres de Oliveira - lperesde
 Luiz was in charge of trying to improve the baseline as well as implementing it, as well as writing the documentation.
