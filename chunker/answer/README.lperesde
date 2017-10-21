@@ -1,6 +1,13 @@
 ## Phrasal Chunking - Homework 2 - CMPT 825, CMPT 383 and CMPT 413
 > This README file constains information about the taks performed by `lperesde` on Homework 2.
-The description of the mathematical models and algorithm used can be read on the files: [./theory/description_algorithm.tex](theory/description_algorithm.tex) and/or [description_algorithm.pdf](description_algorithm.pdf)
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
+
+- Download dependency files: [nlp-hw2-dependencies.zip](https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc)
+  - Mac: `curl https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc -o nlp-hw2-dependencies.zip`
+  - Linux `wget https://drive.google.com/open?id=0B7D6lNeNY7ZRMnN0UG9xY1EyYWc`
 
 ### Luiz Fernando Peres de Oliveira - lperesde
 Luiz was in charge of trying to improve the baseline as well as implementing it, as well as writing the documentation.
