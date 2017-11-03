@@ -10,3 +10,6 @@
   - [README.lperesde](./chunker/answer/README.lperesde)
   - [README.tmosharr](./chunker/answer/README.tmosharr)
 
+### Homework 3 - Word Alignment
+ - [README.lperesde](./aligner/answer/README.lperesde)
+ - [README.tmosharr](./aligner/answer/README.tmosharr)
