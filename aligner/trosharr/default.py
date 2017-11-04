@@ -17,56 +17,55 @@ e_data = "%s.%s" % (os.path.join(opts.datadir, opts.fileprefix), opts.english)
 if opts.logfile:
     logging.basicConfig(filename=opts.logfile, filemode='w', level=logging.INFO)
 
-def convergence(cmp):
-    return cmp > 2
-
-sys.stderr.write("Training with Dice's coefficient...")
 bitext = [[sentence.strip().split() for sentence in pair] for pair in zip(open(f_data), open(e_data))[:opts.num_sents]]
-tk = defaultdict(float)
-itK = 0
-while True:
-    # initialize all counts to zero
-    itK += 1
-    count = defaultdict(int)
-    for(n, (f, e)) in enumerate(bitext):
-        for f_i in set(f):
-            Z = 0
-            for e_j in set(e):
-                # TODO: find tk
-                prob = 1
-                tk[(itK-1, f_i, e_j)] = prob
-                Z += prob
-            for e_j in set(e):
-                c = tk[(itK-1, f_i, e_j)] / Z if Z != 0 else 0
-                count[(f_i, e_j)] += c
-                count[(e_j)]  += c
-                print(c)
-        if n % 500 == 0:
-          sys.stderr.write(".")
-    if convergence(itK):
-        break
+f_count = defaultdict(int)
 
 for (n, (f, e)) in enumerate(bitext):
   for f_i in set(f):
     f_count[f_i] += 1
-    for e_j in set(e):
-      fe_count[(f_i,e_j)] += 1
-  for e_j in set(e):
-    e_count[e_j] += 1
-  if n % 500 == 0:
-    sys.stderr.write(".")
 
-dice = defaultdict(int)
-for (k, (f_i, e_j)) in enumerate(fe_count.keys()):
-  print(k)
-  dice[(f_i,e_j)] = 2.0 * fe_count[(f_i, e_j)] / (f_count[f_i] + e_count[e_j])
-  if k % 5000 == 0:
-    sys.stderr.write(".")
-sys.stderr.write("\n")
+keys_f=f_count.keys()
+v_f=float(len(keys_f))
+t = defaultdict(float)
+k = 0
+sys.stderr.write("Training IBM Model 1 (no nulls) with Expectation Maximization...\n")
+while (k<5):
+    sys.stderr.write("Iteration "+str(k)+" ....................................................\n")
+    k += 1
+    count_e = defaultdict(float)
+    count_fe= defaultdict(float)
+    for(n, (f, e)) in enumerate(bitext):
+        for f_i in set(f):
+            z = 0.0
+            for e_j in set(e):
+                if(k==1):
+                    z+=1.0/v_f
+                else:
+                    z+=t.get((f_i,e_j),0)
+            for e_j in set(e):
+                if (k == 1):
+                    c=(1.0/v_f)/z
+                else:
+                    c=(t.get((f_i, e_j), 0))/z
+                count_fe[(f_i,e_j)]=count_fe.get((f_i,e_j),0)+c
+                count_e[(e_j)]=count_e.get(e_j,0)+c
 
-for (f, e) in bitext:
-  for (i, f_i) in enumerate(f):
-    for (j, e_j) in enumerate(e):
-      if dice[(f_i,e_j)] >= opts.threshold:
-        sys.stdout.write("%i-%i " % (i,j))
-  sys.stdout.write("\n")
+    keys_fe=count_fe.keys()
+    for (f,e) in keys_fe:
+        t[(f,e)]=count_fe[(f,e)]/count_e[e]
+
+sys.stderr.write("Aligning................................................................\n")
+
+result=defaultdict(defaultdict)
+
+for(n, (f, e)) in enumerate(bitext):
+    for (i,f_i) in enumerate(f):
+        bestp = 0
+        bestj = 0
+        for (j,e_j) in enumerate(e):
+            if(t[(f_i,e_j)] > bestp):
+                bestp = t[(f_i,e_j)]
+                bestj = j
+        sys.stdout.write("%i-%i " % (i, bestj))
+    sys.stdout.write("\n")
+
