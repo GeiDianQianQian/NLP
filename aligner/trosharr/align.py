@@ -20,45 +20,49 @@ if opts.logfile:
 bitext = [[sentence.strip().split() for sentence in pair] for pair in zip(open(f_data), open(e_data))[:opts.num_sents]]
 f_count = defaultdict(int)
 
+sys.stderr.write("Initial count")
 for (n, (f, e)) in enumerate(bitext):
   for f_i in set(f):
     f_count[f_i] += 1
+  if n % 500 == 0:
+      sys.stderr.write(".")
 
 keys_f=f_count.keys()
 v_f=float(len(keys_f))
 t = defaultdict(float)
 k = 0
-sys.stderr.write("Training IBM Model 1 (no nulls) with Expectation Maximization...\n")
+sys.stderr.write("\nTraining IBM Model 1 (no nulls) with Expectation Maximization...")
 while (k<5):
-    sys.stderr.write("Iteration "+str(k)+" ....................................................\n")
+    sys.stderr.write("\nIteration "+str(k))
     k += 1
-    count_e = defaultdict(float)
-    count_fe= defaultdict(float)
+    count_e  = defaultdict(float)
+    count_fe = defaultdict(float)
     for(n, (f, e)) in enumerate(bitext):
         for f_i in set(f):
             z = 0.0
             for e_j in set(e):
-                if(k==1):
-                    z+=1.0/v_f
+                if(k == 1):
+                    z += 1.0 / v_f
                 else:
-                    z+=t.get((f_i,e_j),0)
+                    z += t[(f_i,e_j)]
+
             for e_j in set(e):
                 if (k == 1):
-                    c=(1.0/v_f)/z
+                    c = (1.0/v_f)/z
                 else:
-                    c=(t.get((f_i, e_j), 0))/z
-                count_fe[(f_i,e_j)]=count_fe.get((f_i,e_j),0)+c
-                count_e[(e_j)]=count_e.get(e_j,0)+c
-        if(n%100==0):
-            sys.stderr.write(str(n)+"\n")
-            #sys.stderr.write(str(len(bitext))+"\n")
-    keys_fe=count_fe.keys()
-    for (n, (f,e)) in enumerate(keys_fe):
+                    c = t[(f_i, e_j)]/z
+
+                count_fe[(f_i,e_j)] = count_fe[(f_i,e_j)] + c
+                count_e[(e_j)]      = count_e[e_j] + c
+
+        if n % 500 == 0:
+            sys.stderr.write(".")
+
+    keys_fe = count_fe.keys()
+    for (f,e) in keys_fe:
         t[(f,e)]=count_fe[(f,e)]/count_e[e]
-        if (n % 100 == 0):
-            sys.stderr.write(str(n)+"\n")
-            sys.stderr.write(str(len(keys_fe))+"\n")
-sys.stderr.write("Aligning................................................................\n")
+
+sys.stderr.write("\nAligning")
 
 result=defaultdict(defaultdict)
 
@@ -73,3 +77,5 @@ for(n, (f, e)) in enumerate(bitext):
         sys.stdout.write("%i-%i " % (i, bestj))
     sys.stdout.write("\n")
 
+    if n % 500 == 0:
+            sys.stderr.write(".")
