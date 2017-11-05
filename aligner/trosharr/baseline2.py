@@ -43,7 +43,7 @@ while (k<5):
     sys.stderr.write("\nIteration "+str(k))
     k += 1
 
-    sys.stderr.write("\nM step ")
+    #sys.stderr.write("\nM step ")
     count_e  = defaultdict(float)
     count_fe = defaultdict(float)
     count_f  = defaultdict(float)
@@ -87,63 +87,61 @@ while (k<5):
                 count_ef[(e_i,f_j)] = count_ef[(e_i,f_j)] + c
                 count_f[(f_j)] = count_f[f_j] + c
 
-        if n % 500 == 0:
-            sys.stderr.write(".")
 
-    sys.stderr.write("\nE step ")
+    #sys.stderr.write("\nE step ")
 
     for (n, (f,e)) in enumerate(count_fe.keys()):
 
         t1[(f,e)]=count_fe[(f,e)]/count_e[e]
 
-        if n % 500 == 0:
-            sys.stderr.write("-e")
+
 
     for (n, (e,f)) in enumerate(count_ef.keys()):
 
         t2[(e,f)]=count_ef[(e,f)]/count_f[f]
 
-        if n % 500 == 0:
-            sys.stderr.write("-f")
 
 sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
 
-    result1 = defaultdict(int)
-    result2 = defaultdict(int)
+    result = defaultdict(list)
+
+    for (i, e_i) in enumerate(e):
+
+        bestp = 0
+        bestj = None
+
+        for (j, f_j) in enumerate(f):
+            if (t2[(e_i, f_j)] > bestp):
+                bestp = t2[(e_i, f_j)]
+                bestj = f_j
+
+        result[bestj].append(e_i)
 
     for (i,f_i) in enumerate(f):
 
         bestp = 0
         bestj = 0
+        best  = None
 
         for (j,e_j) in enumerate(e):
             if(t1[(f_i,e_j)] > bestp):
                 bestp = t1[(f_i,e_j)]
                 bestj = j
+                best  = e_j
 
-        sys.stderr.write("%s-%s " % (f[i], e[bestj]))
+        if(f_i in result.keys()):
+            if(best in result[f_i]):
+                sys.stdout.write("%i-%i " % (i, bestj))
 
-    #sys.stdout.write("\n")
+    sys.stdout.write("\n")
 
-    if n % 500 == 0:
-        sys.stderr.write("-.")
 
-    for (i, e_i) in enumerate(e):
 
-        bestp = 0
-        bestj = 0
 
-        for (j, f_j) in enumerate(f):
-            if (t2[(e_i, f_j)] > bestp):
-                bestp = t2[(e_i, f_j)]
-                bestj = j
-
-        sys.stderr.write("%s-%s " % (e[i], f[bestj]))
 
     #sys.stdout.write("\n")
 
-    if n % 500 == 0:
-        sys.stderr.write("-.")
+
 
