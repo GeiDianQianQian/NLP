@@ -27,6 +27,15 @@ for (n, (f, e)) in enumerate(bitext):
   if n % 500 == 0:
       sys.stderr.write(".")
 
+def similarity(f_w, e_w):
+    cnt = 0.0
+    for f_ch in f_w:
+        for e_ch in e_w:
+            if (f_ch == e_ch):
+                cnt += 1
+                break
+    return cnt / len(f_w) * 2
+
 keys_f=f_count.keys()
 v_f=float(len(keys_f))
 t = defaultdict(float)
@@ -42,13 +51,15 @@ while (k<5):
             z = 0.0
             for e_j in set(e):
                 if(k == 1):
-                    z += 1.0 / v_f
+                    sim_rate = similarity(f_i, e_j)
+                    v_f += sim_rate
+                    z += (1.0 + sim_rate) / v_f
                 else:
                     z += t[(f_i,e_j)]
 
             for e_j in set(e):
                 if (k == 1):
-                    c = (1.0/v_f)/z
+                    c = z
                 else:
                     c = t[(f_i, e_j)]/z
 
