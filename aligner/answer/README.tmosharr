@@ -1,0 +1,25 @@
+## Word Alignment - Homework 3 - CMPT 825, CMPT 383 and CMPT 413
+> This README file constains information about the taks performed by `tmosharr` on Homework 3.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Turash Mosharraf - tmosharr
+Turash was in charge of making the baseline work and improvements for the project.
+
+#### Tasks performed
+
+- Implementation of baseline described on [here](http://anoopsarkar.github.io/nlp-class/hw3.html).
+- Implementation of mathematical models.
+- Research and brainstorm on how to improve the speed of the algorithm of our group.
+- Testing results against given references.
+- Planning dates, preparing and submitting files. 
+
+#### Logs
+
+| Date                | Author   | Full Message     | Hash                 |
+| :---: | :----------| :-------- | :-----------: |
+| 2017-11-04 17:45:39 | tmosharr | improved baseline but take huge memory, should run on mac| 9820d09a52c7733cca29622e50e1a8f5cf60f6f0 |
+| 2017-11-04 17:40:27 | tmosharr | improved baseline but take huge memory, should run on mac | 356dcc57c43acb15bffc835086a4d0b6d69d1453 |
+| 2017-11-04 06:41:49 | tmosharr | still a lot of room to improve | 453c2ddc810aecd2c3a0cdf04f8b9fc9c7232774 |
+| 2017-11-03 16:23:36 | tmosharr | implemented baseline for very small data | b057b0090abdf02a06966b74f06d5117edc91476 |
+| 2017-11-03 09:02:18 | tmosharr | trying to implement baseline | 55fc1b9e63b5d39b4e6a95c409e78330e5ca9cd3 |
+
