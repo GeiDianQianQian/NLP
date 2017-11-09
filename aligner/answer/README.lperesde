@@ -1,0 +1,29 @@
+## Word Alignment - Homework 3 - CMPT 825, CMPT 383 and CMPT 413
+> This README file constains information about the taks performed by `lperesde` on Homework 3.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Luiz Fernando Peres de Oliveira - lperesde
+Luiz was in charge of trying to improve the baseline as well as implementing it, as well as writing the documentation.
+
+#### Tasks performed
+
+- Setup of GitLab project
+- Research and brainstorm on how to improve the speed of the algorithm of our group.
+- Testing results against given references.
+- Writing documentation for the project.
+
+#### Logs
+
+| Date                | Author   | Full Message     | Hash                 |
+| :---: | :----------| :-------- | :-----------: |
+| 2017-11-09 10:15:09 | Luiz Fernando Peres | Added readme files| 1263dc3fd51c32242e5de42c18529f3d444a6c59 |
+| 2017-11-09 09:47:24 | Luiz Fernando Peres | Renaming files for answer | c5c710f0e7c3c75955b5ce0037b7d38a8052d81f |
+| 2017-11-05 11:54:06 | Luiz Fernando Peres | Adding upload files for turash | 674c8e92ce29c00586e2f4aa14a8b1b5359bbd96 |
+| 2017-11-04 17:51:14 | Luiz Fernando Peres | Added new upload files | ccb632f8bc783c1e15f07d08f8c5c8184f9ae69d |
+| 2017-11-04 17:25:47 | Luiz Fernando Peres | Merging with turash | 20115c80fa01ac1a00869ceaa66e82fea6adf835 |
+| 2017-11-04 17:25:11 | Luiz Fernando Peres | making some improvements on baseline | 4ee87cc0c6c0fa70626e880c0d962ce9b39e6459 |
+| 2017-11-04 02:53:29 | Luiz Fernando Peres | Adding output files for german database | 313b3895f2485d45f80332b67396310ea258c339 |
+| 2017-11-04 01:46:12 | Luiz Fernando Peres | Improving prints for baseline | d05cdb47c5e726813ebc18cb173e70d9e9e11234 |
+| 2017-11-02 23:32:37 | Luiz Fernando Peres | Starting to implement the baseline (it is very bad so far) | 6a0af7c3b3acd44a0a734c486976123d4a98eaae |
+| 2017-11-02 21:23:59 | Luiz Fernando Peres | Setting up readme files | 98ae63409d949f5c054e22c0adf95ea229856d9c |
+
