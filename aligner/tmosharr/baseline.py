@@ -98,7 +98,6 @@ while (k<opts.num_eps):
         t1[(f,e)]=(count_fe[(f,e)]+small)/(count_e[e]+small*v_f)
 
 
-
     for (n, (e,f)) in enumerate(count_ef.keys()):
 
         t2[(e,f)]=(count_ef[(e,f)]+small)/(count_f[f]+small*v_e)

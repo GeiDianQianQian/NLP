@@ -10,6 +10,7 @@ optparser.add_option("-f", "--french", dest="french", default="fr", help="suffix
 optparser.add_option("-l", "--logfile", dest="logfile", default=None, help="filename for logging output")
 optparser.add_option("-t", "--threshold", dest="threshold", default=0.5, type="float", help="threshold for alignment (default=0.5)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int", help="Number of sentences to use for training and alignment")
+optparser.add_option("-k", "--num_epoch", dest="num_eps", default=5, type="int", help="Number of Iterations for training")
 (opts, _) = optparser.parse_args()
 f_data = "%s.%s" % (os.path.join(opts.datadir, opts.fileprefix), opts.french)
 e_data = "%s.%s" % (os.path.join(opts.datadir, opts.fileprefix), opts.english)
@@ -24,46 +25,50 @@ for (n, (f, e)) in enumerate(bitext):
   for f_i in set(f):
     f_count[f_i] += 1
 
-keys_f=f_count.keys()
-v_f=float(len(keys_f))
+v_f=float(len(f_count.keys()))
+small=0.01
+
 t = defaultdict(float)
 k = 0
-sys.stderr.write("Training IBM Model 1 (no nulls) with Expectation Maximization...\n")
-while (k<5):
-    sys.stderr.write("Iteration "+str(k)+" ....................................................\n")
+
+sys.stderr.write("\nTraining IBM Model 1 (no nulls) with Expectation Maximization...")
+while (k<opts.num_eps):
+
+    sys.stderr.write("\nIteration " + str(k))
     k += 1
+
+    sys.stderr.write("\nM step ")
+
     count_e = defaultdict(float)
     count_fe= defaultdict(float)
     for(n, (f, e)) in enumerate(bitext):
-        for f_i in set(f):
+        f.append('NULL_WORD')
+        f.append('NULL_WORD')
+        for f_i in f:
             z = 0.0
-            for e_j in set(e):
+            for e_j in e:
                 if(k==1):
                     z+=1.0/v_f
                 else:
                     z+=t.get((f_i,e_j),0)
-            for e_j in set(e):
+            for e_j in e:
                 if (k == 1):
                     c=(1.0/v_f)/z
                 else:
                     c=(t.get((f_i, e_j), 0))/z
                 count_fe[(f_i,e_j)]=count_fe.get((f_i,e_j),0)+c
                 count_e[(e_j)]=count_e.get(e_j,0)+c
-        if(n%100==0):
-            sys.stderr.write(str(n)+"\n")
-            #sys.stderr.write(str(len(bitext))+"\n")
-    keys_fe=count_fe.keys()
-    for (n, (f,e)) in enumerate(keys_fe):
-        t[(f,e)]=count_fe[(f,e)]/count_e[e]
-        if (n % 100 == 0):
-            sys.stderr.write(str(n)+"\n")
-            sys.stderr.write(str(len(keys_fe))+"\n")
-sys.stderr.write("Aligning................................................................\n")
 
-result=defaultdict(defaultdict)
+    sys.stderr.write("\nE step ")
+    for (n, (f,e)) in enumerate(count_fe.keys()):
+        t[(f,e)]= (count_fe[(f, e)] + small) / (count_e[e] + small * v_f)
+
+sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
     for (i,f_i) in enumerate(f):
+        if(f_i=='NULL_WORD'):
+            continue
         bestp = 0
         bestj = 0
         for (j,e_j) in enumerate(e):
