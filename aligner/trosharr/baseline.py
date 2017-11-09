@@ -10,6 +10,8 @@ optparser.add_option("-f", "--french", dest="french", default="fr", help="suffix
 optparser.add_option("-l", "--logfile", dest="logfile", default=None, help="filename for logging output")
 optparser.add_option("-t", "--threshold", dest="threshold", default=0.5, type="float", help="threshold for alignment (default=0.5)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int", help="Number of sentences to use for training and alignment")
+optparser.add_option("-k", "--num_epoch", dest="num_eps", default=5, type="int", help="Number of Iterations for training")
+
 (opts, _) = optparser.parse_args()
 f_data = "%s.%s" % (os.path.join(opts.datadir, opts.fileprefix), opts.french)
 e_data = "%s.%s" % (os.path.join(opts.datadir, opts.fileprefix), opts.english)
@@ -21,14 +23,14 @@ bitext = [[sentence.strip().split() for sentence in pair] for pair in zip(open(f
 f_count = defaultdict(int)
 e_count = defaultdict(int)
 
-sys.stderr.write("Creating French and English Dictionary, storing counts for each words")
+#sys.stderr.write("Creating French and English Dictionary, storing counts for each words")
 for (n, (f, e)) in enumerate(bitext):
   for f_i in set(f):
     f_count[f_i] += 1
   for e_i in set(e):
     e_count[e_i] += 1
 
-sys.stderr.write("Determining vocabulary size of French and English Dictionary")
+#sys.stderr.write("Determining vocabulary size of French and English Dictionary")
 v_f=float(len(f_count.keys()))
 v_e=float(len(e_count.keys()))
 
@@ -38,12 +40,12 @@ t2 = defaultdict(float)
 k = 0
 sys.stderr.write("\nTraining IBM Model 1 (no nulls) with Expectation Maximization...")
 
-while (k<5):
+while (k<opts.num_eps):
 
     sys.stderr.write("\nIteration "+str(k))
     k += 1
 
-    #sys.stderr.write("\nM step ")
+    sys.stderr.write("\nM step ")
     count_e  = defaultdict(float)
     count_fe = defaultdict(float)
     count_f  = defaultdict(float)
@@ -87,8 +89,8 @@ while (k<5):
                 count_ef[(e_i,f_j)] = count_ef[(e_i,f_j)] + c
                 count_f[(f_j)] = count_f[f_j] + c
 
-
-    #sys.stderr.write("\nE step ")
+    sys.stderr.write("\n"+str(len(count_fe.keys()))+" "+str(len(count_ef.keys())))
+    sys.stderr.write("\nE step ")
 
     for (n, (f,e)) in enumerate(count_fe.keys()):
 
