@@ -32,7 +32,7 @@ for (n, (f, e)) in enumerate(bitext):
 
 #sys.stderr.write("Determining vocabulary size of French and English Dictionary")
 v_f=float(len(f_count.keys()))+1
-v_e=float(len(e_count.keys()))+1
+v_e=float(len(e_count.keys()))
 small=0.01
 
 t1 = defaultdict(float)
@@ -55,7 +55,6 @@ while (k<opts.num_eps):
     for(n, (f, e)) in enumerate(bitext):
 
         f.append('NUULLL')
-        f.append('NUULLL')
         for f_i in f:
 
             z = 0.0
@@ -74,8 +73,7 @@ while (k<opts.num_eps):
                 count_fe[(f_i,e_j)] = count_fe[(f_i,e_j)] + c
                 count_e[(e_j)] = count_e[e_j] + c
 
-        e.append('NUULLL')
-        e.append('NUULLL')
+        #e.append('NUULLL')
         for e_i in e:
 
             z = 0.0
