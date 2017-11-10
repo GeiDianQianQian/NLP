@@ -31,7 +31,7 @@ for (n, (f, e)) in enumerate(bitext):
     e_count[e_i] += 1
 
 #sys.stderr.write("Determining vocabulary size of French and English Dictionary")
-v_f=float(len(f_count.keys()))
+v_f=float(len(f_count.keys()))+1
 v_e=float(len(e_count.keys()))
 small=0.01
 
@@ -39,7 +39,7 @@ t1 = defaultdict(float)
 t2 = defaultdict(float)
 
 k = 0
-sys.stderr.write("\nTraining IBM Model 1 (no nulls) with Expectation Maximization...")
+sys.stderr.write("\nTraining IBM Model 1 with 2 nulls using Expectation Maximization...")
 
 while (k<opts.num_eps):
 
@@ -54,17 +54,18 @@ while (k<opts.num_eps):
 
     for(n, (f, e)) in enumerate(bitext):
 
-        for f_i in set(f):
+        f.append('NUULLL')
+        for f_i in f:
 
             z = 0.0
-            for e_j in set(e):
+            for e_j in e:
                 if(k == 1):
                     z += 1.0 / v_f
                 else:
                     z += t1[(f_i,e_j)]
 
             c = 0.0
-            for e_j in set(e):
+            for e_j in e:
                 if (k == 1):
                     c = (1.0/v_f)/z
                 else:
@@ -72,17 +73,18 @@ while (k<opts.num_eps):
                 count_fe[(f_i,e_j)] = count_fe[(f_i,e_j)] + c
                 count_e[(e_j)] = count_e[e_j] + c
 
-        for e_i in set(e):
+        #e.append('NUULLL')
+        for e_i in e:
 
             z = 0.0
-            for f_j in set(f):
+            for f_j in f:
                 if(k == 1):
                     z += 1.0 / v_e
                 else:
                     z += t2[(e_i,f_j)]
 
             c = 0.0
-            for f_j in set(f):
+            for f_j in f:
                 if (k == 1):
                     c = (1.0/v_e)/z
                 else:
@@ -98,6 +100,7 @@ while (k<opts.num_eps):
         t1[(f,e)]=(count_fe[(f,e)]+small)/(count_e[e]+small*v_f)
 
 
+
     for (n, (e,f)) in enumerate(count_ef.keys()):
 
         t2[(e,f)]=(count_ef[(e,f)]+small)/(count_f[f]+small*v_e)
@@ -111,10 +114,14 @@ for(n, (f, e)) in enumerate(bitext):
 
     for (i, e_i) in enumerate(e):
 
+        if(e_i=='NUULLL'):
+            continue
         bestp = 0
         bestj = None
 
         for (j, f_j) in enumerate(f):
+            if (f_j == 'NUULLL'):
+                continue
             if (t2[(e_i, f_j)] > bestp):
                 bestp = t2[(e_i, f_j)]
                 bestj = f_j
@@ -123,11 +130,15 @@ for(n, (f, e)) in enumerate(bitext):
 
     for (i,f_i) in enumerate(f):
 
+        if (f_i == 'NUULLL'):
+            continue
         bestp = 0
         bestj = 0
         best  = None
 
         for (j,e_j) in enumerate(e):
+            if (e_j == 'NUULLL'):
+                continue
             if(t1[(f_i,e_j)] > bestp):
                 bestp = t1[(f_i,e_j)]
                 bestj = j

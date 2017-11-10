@@ -1,0 +1,135 @@
+%=======================CIS 9615 LaTeX template==================
+%
+% How to use:
+%    1. Update your information in section "A" below
+%    2. Write your answers in section "B" below. Precede answers for all 
+%       parts of a question with the command "\question{n}{desc}" where n is
+%       the question number and "desc" is a short, one-line description of 
+%       the problem. There is no need to restate the problem.
+%    3. If a question has multiple parts, precede the answer to part x with the
+%       command "\part{x}".
+%    4. If a problem asks you to design an algorithm, use the commands
+%       \algorithm, \correctness, \runtime to precede your discussion of the 
+%       description of the algorithm, its correctness, and its running time, respectively.
+%    5. You can include graphics by using the command \includegraphics{FILENAME}
+%
+\documentclass[11pt]{article}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{url}
+\usepackage[noend]{algorithmic}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{textcomp}
+\setlength{\arrayrulewidth}{1pt}
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+\newtheorem{theorem}{\textbf{Theorem}}
+\newtheorem{lemma}{\textbf{Lemma}}
+\newtheorem{proposition}{\textbf{Proposition}}
+\newtheorem{definition}{\textbf{Definition}}
+\newtheorem{corollary}{\textbf{Corollary}}
+\newtheorem{conjecture}{\textbf{Conjecture}}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{url}
+\usepackage[noend]{algorithmic}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\headheight}{13.6pt}
+\newcommand\question[2]{\vspace{.25in}\hrule\textbf{#1: #2}\vspace{.5em}\hrule\vspace{.10in}}
+\renewcommand\part[1]{\vspace{.10in}\textbf{(#1)}}
+%\newcommand\algorithm{\vspace{.10in}\textbf{Algorithm: }}
+\newcommand\prof{\vspace{.10in}\textbf{Proof: }}
+\newcommand\correctness{\vspace{.10in}\textbf{Correctness: }}
+\newcommand\base {\vspace{.10in}\textbf{Base Case: }}
+\newcommand\inductive {\vspace{.10in}\textbf{Inductive Step: }}
+\newcommand\runtime{\vspace{.10in}\textbf{Running time: }}
+\pagestyle{fancyplain}
+\lhead{\textbf{\NAME}}
+\lhead{\textbf{\NAME\ (\ID)}}
+\chead{\textbf{\HWNUM}}
+\rhead{CMPT 825 and CMPT 413, Fall 2017}
+%\begin{document}\raggedright
+\begin{document}
+%Section A==============Change the values below to match your information==================
+\newcommand\NAME{Turash and Luiz}  % your name
+\newcommand\ID{tmosharr \& lperesde}     % your Temple AccessNet Account
+\newcommand\HWNUM{}              % the homework number
+
+
+
+%Section B==============Put your answers to the questions below here=======================
+
+% no need to restate the problem --- the graders know which problem is which,
+% but replacing "The First Problem" with a short phrase will help you remember
+% which problem this is when you read over your homeworks to study.
+%send to : HW3Subm.43vjts2a9ie04m7x@u.box.com
+\question{A}{Theory} 
+
+The algorithm used on this assignment was the implementation of the baseline merged with the ability of finding null word alignments and the posterior probability, accounting both $p(f|e)$ and $p(e|f)$.
+
+\question{B}{Algorithm} 
+
+The algorithm for the word alignment is given below:	
+
+\begin{algorithm}[htb]
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}\hspace{10.7pt}}
+	\renewcommand\algorithmicensure {\textbf{Output:} }
+	\caption{Word Alignment}
+	\label{alg:pbg}
+		\begin{algorithmic}[1]
+		\vspace{3pt}
+		\REQUIRE
+		French/German sentences $f$ and English sentences $e$\\
+		\ENSURE Aligned words \\
+		\STATE Get count of English words $v_e$ and French/German words $v_f$
+		\STATE Initialize dictionaries $t_1$, $t_2$, $count_e$, $count_f$  $count_{fe}$ and $count_{ef}$
+		\REPEAT
+		  \STATE Make NULL available
+		  \FOR {each pair of sentences ($f$, $e$)}
+			\FOR {each $f_i$ in $f$}
+			  \STATE Initialize $c = 0$ and $z = 0$
+			  \FOR {each $e_j$ in $e$}
+			    \STATE normalize $z = 1.0 / v_f$ \textbf{if} first iteration \textbf{else} $z += t_1[(f_i,e_j)]$ 
+			  \ENDFOR
+			  \FOR {each $e_j$ in $e$}
+			    \STATE normalize $c = (1.0/v_f)/z$ \textbf{if} first iteration \textbf{else} $c = t_1[(f_i, e_j)]/z$
+			    \STATE increment both $count_e[e_j]$ and $count_{fe}[(f_i,e_j)]$ with the value of $c$
+			  \ENDFOR
+			\ENDFOR
+			\FOR {each $e_i$ in $e$}
+			  \STATE Initialize $c = 0$ and $z = 0$
+			  \FOR {each $f_j$ in $f$}
+			    \STATE normalize $z = 1.0 / v_e$ \textbf{if} first iteration \textbf{else} $z += t_2[(e_i,f_j)]$ 
+			  \ENDFOR
+			  \FOR {each $f_j$ in $f$}
+			    \STATE normalize $c = (1.0/v_e)/z$ \textbf{if} first iteration \textbf{else} $c = t_2[(e_i, f_j)]/z$
+			    \STATE increment both $count_f[f_j]$ and $count_{ef}[(e_i,f_j)]$ with the value of $c$
+			  \ENDFOR
+			\ENDFOR
+		  \ENDFOR
+		  \FOR {each pair $(e, f)$ in $count_{fe}$}
+		    \STATE $t_1[(f,e)] = (count_{fe}[(f,e)] + 0.1)/(count_e[e] + 0.1 * v_f)$
+		  \ENDFOR
+		  \FOR {each pair $(e, f)$ in $count_{ef}$}
+		    \STATE $t_2[(e,f)] = (count_{ef}[(e, f)] + 0.1)/(count_f[f] + 0.1 * v_e)$
+		  \ENDFOR
+		\UNTIL {\# of iterations not 5}
+		\STATE Print the best word alignments according to the instructions of the baseline and ignore the alignments defined as \textit{NULL}
+	\end{algorithmic}
+\end{algorithm}
+
+\end{document}
