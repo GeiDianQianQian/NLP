@@ -79,56 +79,109 @@
 %send to : HW3Subm.43vjts2a9ie04m7x@u.box.com
 \question{A}{Theory} 
 
-The algorithm used on this assignment was the implementation of the baseline merged with the ability of finding null word alignments and the posterior probability, accounting both $p(f|e)$ and $p(e|f)$.
+The algorithm used on this assignment was an enhanced version of the baseline algorithm. The enhancements are listed below:
 
+\begin{itemize}
+
+
+\item  Considered both $p(f|e)$ and $p(e|f)$. The output is the intersection of both sets.
+\item  Applied probability smoothing for both $p(f|e)$ and $p(e|f)$.
+Assuming we have a source vocabulary of size $v_f$ and a target vocabulary of size  $v_e$, the formula for calculating probabilities are smoothed as the followings:
+
+\begin{equation}
+P(f|e) = \frac{(count_{f,e} + \delta)}{(count_{e} + \delta * v_f)}
+\end{equation} 
+\begin{equation}
+P(e|f) = \frac{(count_{e,f} + \delta)}{(count_{f} + \delta * v_e)}
+\end{equation} 
+
+Here, $\delta$ is a very small constant. We chose it to be 0.01
+
+\end{itemize}
 \question{B}{Algorithm} 
 
-The algorithm for the word alignment is given below:	
+The algorithms for the both the word alignment and decoding are shown in the next page:	
 
 \begin{algorithm}[htb]
 	\renewcommand{\algorithmicrequire}{\textbf{Input:}\hspace{10.7pt}}
 	\renewcommand\algorithmicensure {\textbf{Output:} }
-	\caption{Word Alignment}
+	\caption{Espectation Maximization Training}
 	\label{alg:pbg}
 		\begin{algorithmic}[1]
 		\vspace{3pt}
 		\REQUIRE
-		French/German sentences $f$ and English sentences $e$\\
-		\ENSURE Aligned words \\
-		\STATE Get count of English words $v_e$ and French/German words $v_f$
-		\STATE Initialize dictionaries $t_1$, $t_2$, $count_e$, $count_f$  $count_{fe}$ and $count_{ef}$
-		\REPEAT
-		  \STATE Make NULL available
-		  \FOR {each pair of sentences ($f$, $e$)}
+		Set of sentences $F$ from source language and
+		Set of sentences $E$ from target language\\
+		\ENSURE 
+		Probability distributions $P(f|e)$ and $P(e|f)$ 
+		for any source word $e$ and target word $f$\\
+		\STATE $v_f \gets$ number of distinct source words
+		\STATE $v_e \gets$ number of distinct target words
+		\STATE Initialize all counts to 0
+		\STATE Initialize $t1_{f|e}\gets \frac{1}{v_f}$ and $t2_{e|f}\gets \frac{1}{v_e}$
+		for all possible pair $(f,e)$
+		\STATE Initialize $\delta \gets$ 0.01  
+		\WHILE{$Epoch \le MaxEpoch$}
+		  \STATE $Epoch \gets Epoch+1$
+		  \FOR {each pair of sentences $(f,e)$}
 			\FOR {each $f_i$ in $f$}
-			  \STATE Initialize $c = 0$ and $z = 0$
+			  \STATE $c \gets 0$ and $z \gets 0$
 			  \FOR {each $e_j$ in $e$}
-			    \STATE normalize $z = 1.0 / v_f$ \textbf{if} first iteration \textbf{else} $z += t_1[(f_i,e_j)]$ 
+			    \STATE  $z \gets z + t1_{f_i|e_j}$ 
 			  \ENDFOR
 			  \FOR {each $e_j$ in $e$}
-			    \STATE normalize $c = (1.0/v_f)/z$ \textbf{if} first iteration \textbf{else} $c = t_1[(f_i, e_j)]/z$
-			    \STATE increment both $count_e[e_j]$ and $count_{fe}[(f_i,e_j)]$ with the value of $c$
+			    \STATE $count_{f_i,e_j} \gets count_{f_i,e_j}+\frac{t1_{f_i|e_j}}{z}$ and $count_{e_j} \gets count_{e_j}+\frac{t1_{f_i|e_j}}{z}$ 
 			  \ENDFOR
 			\ENDFOR
 			\FOR {each $e_i$ in $e$}
-			  \STATE Initialize $c = 0$ and $z = 0$
+			  \STATE $c \gets 0$ and $z \gets 0$
 			  \FOR {each $f_j$ in $f$}
-			    \STATE normalize $z = 1.0 / v_e$ \textbf{if} first iteration \textbf{else} $z += t_2[(e_i,f_j)]$ 
+			     \STATE  $z \gets z + t2_{e_i|f_j}$
 			  \ENDFOR
 			  \FOR {each $f_j$ in $f$}
-			    \STATE normalize $c = (1.0/v_e)/z$ \textbf{if} first iteration \textbf{else} $c = t_2[(e_i, f_j)]/z$
-			    \STATE increment both $count_f[f_j]$ and $count_{ef}[(e_i,f_j)]$ with the value of $c$
+			    \STATE $count_{e_i,f_j} \gets count_{e_i,f_j}+\frac{t2_{e_i|f_j}}{z}$ and $count_{f_j} \gets count_{f_j}+\frac{t2_{e_i|f_j}}{z}$
 			  \ENDFOR
 			\ENDFOR
 		  \ENDFOR
-		  \FOR {each pair $(e, f)$ in $count_{fe}$}
-		    \STATE $t_1[(f,e)] = (count_{fe}[(f,e)] + 0.1)/(count_e[e] + 0.1 * v_f)$
+		  
+		  \FOR {each pair $(f,e)$ in $count_{f,e}$}
+		    \STATE $t1_{f|e} \gets \frac{(count_{f,e} + \delta)}{(count_{e} + \delta * v_f)}$
 		  \ENDFOR
-		  \FOR {each pair $(e, f)$ in $count_{ef}$}
-		    \STATE $t_2[(e,f)] = (count_{ef}[(e, f)] + 0.1)/(count_f[f] + 0.1 * v_e)$
+		  
+		  \FOR {each pair $(e,f)$ in $count_{e,f}$}
+		    \STATE $t2_{e|f} \gets \frac{(count_{e,f} + \delta)}{(count_{f} + \delta * v_e)}$
 		  \ENDFOR
-		\UNTIL {\# of iterations not 5}
-		\STATE Print the best word alignments according to the instructions of the baseline and ignore the alignments defined as \textit{NULL}
+		\ENDWHILE 
+	  \RETURN $t1_{f|e}$ and $t2_{e|f}$ for all $e$ and $f$
+	\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[htb]
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}\hspace{10.7pt}}
+	\renewcommand\algorithmicensure {\textbf{Output:} }
+	\caption{Decoding}
+	\label{alg:pbg}
+		\begin{algorithmic}[1]
+		\vspace{3pt}
+		\REQUIRE
+		Probability distributions $t1_{f|e}$ and $t2_{e|f}$ 
+		for any source word $e$ and target word $f$\\
+		\ENSURE Set of aligned word pairs $(f_i,e_j)$\\
+		\STATE $AlignedWords \gets \emptyset$
+		\FOR {each pair of sentences $(f,e)$}
+			\STATE $list_{FE} \gets \emptyset$ and $list_{EF} \gets \emptyset$
+			\FOR {each $f_i$ in $f$}
+			 	\STATE $best_j \gets argmax_{e_j} t1_{f_i|e_j}$
+			  	\STATE add pair $(f_i,e_j)$ to $list_{FE}$
+			\ENDFOR
+			\FOR {each $e_i$ in $e$}
+			 	\STATE $best_j \gets argmax_{f_j} t2_{e_i|f_j}$
+			  	\STATE add pair $(f_j,e_i)$ to $list_{EF}$
+			\ENDFOR
+			\STATE add $list_{FE} \cup list_{EF}$ to $AlignedWords$
+		\ENDFOR
+	    \RETURN $AlignedWords$ 
 	\end{algorithmic}
 \end{algorithm}
 

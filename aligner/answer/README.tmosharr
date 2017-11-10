@@ -2,8 +2,15 @@
 > This README file constains information about the taks performed by `tmosharr` on Homework 3.
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
+###
+Please run for 10 epochs to get best AER. the number of epochs can be controlled by: 
+
+python answer/align.py -p europarl -f de -n 100000 -k 10 > output.a
+head -1000 output.a > upload.a 
+
 ### Turash Mosharraf - tmosharr
-Turash was in charge of making the baseline work and improvements for the project.
+Turash was in charge of implementing the baseline, applying smoothing and enhancing the algorithm using both P(f|e) and P(e|f)   
+for the project.
 
 #### Tasks performed
 
