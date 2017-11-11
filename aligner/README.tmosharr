@@ -20,8 +20,8 @@ Turash was in charge of implementing the baseline, applying smoothing and enhanc
 for the project.
 
 #### Tasks performed
+
 - Implementation of baseline described on [here](http://anoopsarkar.github.io/nlp-class/hw3.html).
-- Improving the score by applying smoothing and enhancing the algorithm using both P(f|e) and P(e|f)
 - Implementation of mathematical models.
 - Research and brainstorm on how to improve the speed of the algorithm of our group.
 - Testing results against given references.
@@ -31,15 +31,6 @@ for the project.
 
 | Date                | Author   | Full Message     | Hash                 |
 | :---: | :----------| :-------- | :-----------: |
-| 2017-11-10 00:59:47 | tmosharr | Creating submission directory | 9ed4995ab3800a835d10ae12906472502826a2b4 |
-| 2017-11-09 10:25:36 | tmosharr | Creating Answer Directory for Submission | 4d310d50edcb389d2d647d3d662f78507ffd2c95 |
-| 2017-11-09 19:15:21 | tmosharr | Finally got 0.34 on leaderboardgit status Yaygit status! | e4a9b09fc74e777db0e96bc52327fc5636b11e42 |
-| 2017-11-09 17:48:31 | tmosharr | AER 0.345 | b668faa2db4659689db9540c56367d811bd1ecdd |
-| 2017-11-09 17:42:23 | tmosharr | synchronizing | 54cac3f33b39a3a04abd3347c68f507ba5099b9d |
-| 2017-11-09 17:36:42 | tmosharr | Trying to add nulls | 578994acc27cb32d8d9e1f9dd497f018d0aa78f8 |
-| 2017-11-09 05:19:32 | tmosharr | added smoothing | 6649ee72dcdb40fa72304f9364be312c58c77305 |
-| 2017-11-09 02:06:19 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | 0a089198c2a56bfca86f7aff7a8efe99e47bb2cf |
-| 2017-11-09 02:05:13 | tmosharr | adding parameters for iteration | 8c84a5abb929febab39517b09d3646351d7e2b80 |
 | 2017-11-04 17:45:39 | tmosharr | improved baseline but take huge memory, should run on mac| 9820d09a52c7733cca29622e50e1a8f5cf60f6f0 |
 | 2017-11-04 17:40:27 | tmosharr | improved baseline but take huge memory, should run on mac | 356dcc57c43acb15bffc835086a4d0b6d69d1453 |
 | 2017-11-04 06:41:49 | tmosharr | still a lot of room to improve | 453c2ddc810aecd2c3a0cdf04f8b9fc9c7232774 |

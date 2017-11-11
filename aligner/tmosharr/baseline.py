@@ -31,8 +31,8 @@ for (n, (f, e)) in enumerate(bitext):
     e_count[e_i] += 1
 
 #sys.stderr.write("Determining vocabulary size of French and English Dictionary")
-v_f=float(len(f_count.keys()))
-v_e=float(len(e_count.keys()))
+v_f=float(len(f_count.keys()))+1
+v_e=float(len(e_count.keys()))+1
 small=0.01
 
 t1 = defaultdict(float)
@@ -54,6 +54,7 @@ while (k<opts.num_eps):
 
     for(n, (f, e)) in enumerate(bitext):
 
+        f.append('NULL_VALUE')
         for f_i in set(f):
 
             z = 0.0
@@ -72,6 +73,8 @@ while (k<opts.num_eps):
                 count_fe[(f_i,e_j)] = count_fe[(f_i,e_j)] + c
                 count_e[(e_j)] = count_e[e_j] + c
 
+        f=f[:-1]
+        e.append('NULL_VALUE')
         for e_i in set(e):
 
             z = 0.0
@@ -108,7 +111,7 @@ sys.stderr.write("\nAligning ")
 for(n, (f, e)) in enumerate(bitext):
 
     result = defaultdict(list)
-
+    e.append('NULL_VALUE')
     for (i, e_i) in enumerate(e):
 
         bestp = 0
@@ -121,6 +124,8 @@ for(n, (f, e)) in enumerate(bitext):
 
         result[bestj].append(e_i)
 
+    e=e[:-1]
+    f.append('NULL_VALUE')
     for (i,f_i) in enumerate(f):
 
         bestp = 0
@@ -134,7 +139,7 @@ for(n, (f, e)) in enumerate(bitext):
                 best  = e_j
 
         if(f_i in result.keys()):
-            if(best in result[f_i]):
+            if(best in result[f_i] and best != 'NULL_VALUE' and f_i != 'NULL_VALUE'):
                 sys.stdout.write("%i-%i " % (i, bestj))
 
     sys.stdout.write("\n")
