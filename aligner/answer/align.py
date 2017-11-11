@@ -25,15 +25,16 @@ e_count = defaultdict(int)
 
 #sys.stderr.write("Creating French and English Dictionary, storing counts for each words")
 for (n, (f, e)) in enumerate(bitext):
+  e.append("n_wd")
   for f_i in set(f):
     f_count[f_i] += 1
   for e_i in set(e):
     e_count[e_i] += 1
 
 #sys.stderr.write("Determining vocabulary size of French and English Dictionary")
-v_f=float(len(f_count.keys()))
-v_e=float(len(e_count.keys()))
-small=0.01
+v_f = float(len(f_count.keys()))
+v_e = float(len(e_count.keys()))
+small = 0.01
 
 t1 = defaultdict(float)
 t2 = defaultdict(float)
@@ -41,9 +42,9 @@ t2 = defaultdict(float)
 k = 0
 sys.stderr.write("\nTraining IBM Model 1 (no nulls) with Expectation Maximization...")
 
-while (k<opts.num_eps):
+while (k < opts.num_eps):
 
-    sys.stderr.write("\nIteration "+str(k))
+    sys.stderr.write("\nIteration " + str(k))
     k += 1
 
     sys.stderr.write("\nM step ")
@@ -53,7 +54,7 @@ while (k<opts.num_eps):
     count_ef = defaultdict(float)
 
     for(n, (f, e)) in enumerate(bitext):
-
+        e.append("n_wd")
         for f_i in set(f):
 
             z = 0.0
@@ -94,19 +95,17 @@ while (k<opts.num_eps):
     sys.stderr.write("\nE step ")
 
     for (n, (f,e)) in enumerate(count_fe.keys()):
-
         t1[(f,e)]=(count_fe[(f,e)]+small)/(count_e[e]+small*v_f)
 
 
     for (n, (e,f)) in enumerate(count_ef.keys()):
-
         t2[(e,f)]=(count_ef[(e,f)]+small)/(count_f[f]+small*v_e)
 
 
 sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
-
+    e.append("n_wd")
     result = defaultdict(list)
 
     for (i, e_i) in enumerate(e):
@@ -134,16 +133,9 @@ for(n, (f, e)) in enumerate(bitext):
                 best  = e_j
 
         if(f_i in result.keys()):
-            if(best in result[f_i]):
+            if(best in result[f_i]) and best != "n_wd":
                 sys.stdout.write("%i-%i " % (i, bestj))
 
     sys.stdout.write("\n")
 
-
-
-
-
     #sys.stdout.write("\n")
-
-
-
