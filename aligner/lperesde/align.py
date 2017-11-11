@@ -25,6 +25,7 @@ e_count = defaultdict(int)
 
 #sys.stderr.write("Creating French and English Dictionary, storing counts for each words")
 for (n, (f, e)) in enumerate(bitext):
+  e.append("n_wd")
   for f_i in set(f):
     f_count[f_i] += 1
   for e_i in set(e):
@@ -53,6 +54,7 @@ while (k < opts.num_eps):
     count_ef = defaultdict(float)
 
     for(n, (f, e)) in enumerate(bitext):
+        e.append("n_wd")
         for f_i in set(f):
 
             z = 0.0
@@ -88,7 +90,7 @@ while (k < opts.num_eps):
                     c = t2[(e_i, f_j)]/z
                 count_ef[(e_i,f_j)] = count_ef[(e_i,f_j)] + c
                 count_f[(f_j)] = count_f[f_j] + c
-        f = f[:-1]
+
     sys.stderr.write("\n"+str(len(count_fe.keys()))+" "+str(len(count_ef.keys())))
     sys.stderr.write("\nE step ")
 
@@ -103,7 +105,7 @@ while (k < opts.num_eps):
 sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
-
+    e.append("n_wd")
     result = defaultdict(list)
 
     for (i, e_i) in enumerate(e):
@@ -131,7 +133,7 @@ for(n, (f, e)) in enumerate(bitext):
                 best  = e_j
 
         if(f_i in result.keys()):
-            if(best in result[f_i]):
+            if(best in result[f_i]) and best != "n_wd":
                 sys.stdout.write("%i-%i " % (i, bestj))
 
     sys.stdout.write("\n")
