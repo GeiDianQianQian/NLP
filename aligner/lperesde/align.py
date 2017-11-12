@@ -26,6 +26,7 @@ e_count = defaultdict(int)
 #sys.stderr.write("Creating French and English Dictionary, storing counts for each words")
 for (n, (f, e)) in enumerate(bitext):
   e.append("n_wd")
+  f.append("n_wd")
   for f_i in set(f):
     f_count[f_i] += 1
   for e_i in set(e):
@@ -55,6 +56,7 @@ while (k < opts.num_eps):
 
     for(n, (f, e)) in enumerate(bitext):
         e.append("n_wd")
+        f.append("n_wd")
         for f_i in set(f):
 
             z = 0.0
@@ -106,6 +108,7 @@ sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
     e.append("n_wd")
+    f.append("n_wd")
     result = defaultdict(list)
 
     for (i, e_i) in enumerate(e):
