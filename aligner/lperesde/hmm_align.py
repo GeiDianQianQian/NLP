@@ -23,16 +23,21 @@ bitext = [[sentence.lower().strip().split() for sentence in pair] for pair in zi
 
 sys.stderr.write("\nGetting size vocabulary f")
 count_f = defaultdict(float)
+count_e = defaultdict(float)
 for (n, (f, e)) in enumerate(bitext):
     for f_i in set(f):
         count_f[f_i] += 1
+    for e_j in set(e):
+        count_e[e_j] += 1
     if n % 500 == 0:
         sys.stderr.write(".")
 
 sys.stderr.write("\nApplying IBM model 1")
 v_f = float(len(count_f.keys()))
+v_e = float(len(count_e.keys()))
 small = 0.01
 t1 = defaultdict(float)
+t2 = defaultdict(float)
 k = 0
 
 while (k < opts.num_eps):
@@ -40,9 +45,12 @@ while (k < opts.num_eps):
     sys.stderr.write("\nIteration " + str(k))
     count_e  = defaultdict(float)
     count_fe = defaultdict(float)
+    count_f  = defaultdict(float)
+    count_ef = defaultdict(float)
 
     for(n, (f, e)) in enumerate(bitext):
         e.append("n_wd")
+        f.append("n_wd")
         for f_i in set(f):
             z = 0.0
             for e_j in set(e):
@@ -53,6 +61,17 @@ while (k < opts.num_eps):
                 c = t1[(f_i, e_j)] / z if k > 1 else 1.0
                 count_fe[(f_i, e_j)] = count_fe[(f_i, e_j)] + c
                 count_e[(e_j)] = count_e[e_j] + c
+        
+        for e_i in set(e):
+            z = 0.0
+            for f_j in set(f):
+                z += t2[(e_i, f_j)] if k > 1 else 1.0 / v_e
+
+            c = 0.0
+            for f_j in set(f):
+                c = t2[(e_i, f_j)] / z if k > 1 else 1.0
+                count_ef[(e_i, f_j)] = count_ef[(e_i, f_j)] + c
+                count_f[(f_j)] = count_f[f_j] + c
 
         if n % 500 == 0:
             sys.stderr.write(".")
@@ -60,12 +79,35 @@ while (k < opts.num_eps):
     sys.stderr.write("\nGetting translation rate")
 
     for (n, (f, e)) in enumerate(count_fe.keys()):
-        t1[(f,e)] = (count_fe[(f, e)] + small) / (count_e[e] + small * v_f)
+        t1[(f, e)] = (count_fe[(f, e)] + small) / (count_e[e] + small * v_f)
+    for (n, (e, f)) in enumerate(count_ef.keys()):
+        t2[(e, f)] = (count_ef[(e, f)] + small) / (count_f[f] + small * v_e)
 
 sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
     e.append("n_wd")
+    f.append("n_wd")
+    result = defaultdict(list)
+
+    for (i, e_i) in enumerate(e):
+        bestp = 0
+        bestj = 0
+        for (j, f_j) in enumerate(f):
+            curp = t2[(e_i, f_j)]
+            if(curp > bestp):
+                bestp = curp
+                bestj = j
+                word = f_j
+            elif(curp == bestp):
+                if (abs(i - j) < abs(i - bestj)):
+                    bestp = curp
+                    bestj = j
+                    word = f_j
+
+        # align e_aj to f_j
+        result[i] = bestj
+
     for (i, f_i) in enumerate(f):
         bestp = 0
         bestj = 0
@@ -82,8 +124,12 @@ for(n, (f, e)) in enumerate(bitext):
                     bestj = j
                     word = e_j
 
-        if word != "n_wd":
+        # if f_j matches to e_aj, then we are sure about it
+        if result[bestj] == i and word != "n_wd":
             sys.stdout.write("%i-%i " % (i, bestj))
+        # otherwise we are not so sure about it
+        # elif word != "n_wd":
+        #     sys.stdout.write("%i-%i " % (i, bestj))
 
     sys.stdout.write("\n")
     if n % 500 == 0:
