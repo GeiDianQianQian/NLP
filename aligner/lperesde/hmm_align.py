@@ -42,7 +42,7 @@ while (k < opts.num_eps):
     count_fe = defaultdict(float)
 
     for(n, (f, e)) in enumerate(bitext):
-        e.insert(0, "n_wd")
+        e.append("n_wd")
         for f_i in set(f):
             z = 0.0
             for e_j in set(e):
@@ -65,16 +65,18 @@ while (k < opts.num_eps):
 sys.stderr.write("\nAligning ")
 
 for(n, (f, e)) in enumerate(bitext):
-    e.insert(0, "n_wd")
+    e.append("n_wd")
     for (i, f_i) in enumerate(f):
         bestp = 0
         bestj = 0
+        word  = None
         for (j, e_j) in enumerate(e):
             if(t1[(f_i, e_j)] > bestp):
                 bestp = t1[(f_i, e_j)]
                 bestj = j
+                word = e_j
 
-        if bestj != 0:
+        if word != "n_wd":
             sys.stdout.write("%i-%i " % (i, bestj))
 
     sys.stdout.write("\n")
