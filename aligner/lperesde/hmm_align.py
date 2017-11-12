@@ -71,10 +71,16 @@ for(n, (f, e)) in enumerate(bitext):
         bestj = 0
         word  = None
         for (j, e_j) in enumerate(e):
-            if(t1[(f_i, e_j)] > bestp):
-                bestp = t1[(f_i, e_j)]
+            curp = t1[(f_i, e_j)]
+            if(curp > bestp):
+                bestp = curp
                 bestj = j
                 word = e_j
+            elif(curp == bestp):
+                if (abs(i - j) < abs(i - bestj)):
+                    bestp = curp
+                    bestj = j
+                    word = e_j
 
         if word != "n_wd":
             sys.stdout.write("%i-%i " % (i, bestj))
