@@ -10,7 +10,7 @@ cd to the directory where the align.py file is located.
 once incide the directory, run the following command:
 python align.py -p europarl -f de -n 100000 -k 10 > output.a
 
-it takes very long time. Once the output.a is generated, run the following command:
+it takes very long time(around 32min on a Macbook Pro). Once the output.a is generated, run the following command:
 head -1000 output.a > upload.a
 
 The overall procedure is very long. Therefore, one upload.a file it attached in the directory. 

@@ -85,6 +85,8 @@ The algorithm used on this assignment was an enhanced version of the baseline al
 
 
 \item  Considered both $p(f|e)$ and $p(e|f)$. The output is the intersection of both sets.
+\item  Added NULL words to the end of each $f$ and $e$ sentences.
+\item  The alignments considered are the nearest to the current index $i$. According to the last sentence on \textit{pg. 837} of the HMM-Based Word Alignment in Statistical Translation paper (http://aclweb.org/anthology/C/C96/C96-2141.pdf), the difference in the position index is smaller than 3 (for Indoeuropean languages). 
 \item  Applied probability smoothing for both $p(f|e)$ and $p(e|f)$.
 Assuming we have a source vocabulary of size $v_f$ and a target vocabulary of size  $v_e$, the formula for calculating probabilities are smoothed as the followings:
 
@@ -115,8 +117,8 @@ The algorithms for the both the word alignment and decoding are shown in the nex
 		\ENSURE 
 		Probability distributions $P(f|e)$ and $P(e|f)$ 
 		for any source word $e$ and target word $f$\\
-		\STATE $v_f \gets$ number of distinct source words
-		\STATE $v_e \gets$ number of distinct target words
+		\STATE add a last word to represent \textit{NULL} on each $f$ and $e$ sentences.
+		\STATE $v_f \gets$ number of distinct source words and $v_e \gets$ number of distinct target words
 		\STATE Initialize all counts to 0
 		\STATE Initialize $t1_{f|e}\gets \frac{1}{v_f}$ and $t2_{e|f}\gets \frac{1}{v_e}$
 		for all possible pair $(f,e)$
@@ -170,13 +172,14 @@ The algorithms for the both the word alignment and decoding are shown in the nex
 		\ENSURE Set of aligned word pairs $(f_i,e_j)$\\
 		\STATE $AlignedWords \gets \emptyset$
 		\FOR {each pair of sentences $(f,e)$}
+			\STATE Ignore possible $NULL$ alignments
 			\STATE $list_{FE} \gets \emptyset$ and $list_{EF} \gets \emptyset$
 			\FOR {each $f_i$ in $f$}
-			 	\STATE $best_j \gets argmax_{e_j} t1_{f_i|e_j}$
+			 	\STATE $best_j \gets argmax_{e_j} t1_{f_i|e_j}$ \textit{// if $p(j) = p(best_j)$ the nearest distance $d(f_aj, e_j)$ is chosen}
 			  	\STATE add pair $(f_i,e_j)$ to $list_{FE}$
 			\ENDFOR
 			\FOR {each $e_i$ in $e$}
-			 	\STATE $best_j \gets argmax_{f_j} t2_{e_i|f_j}$
+			 	\STATE $best_j \gets argmax_{f_j} t2_{e_i|f_j}$ \textit{// if $p(j) = p(best_j)$ the nearest distance $d(e_aj, f_j)$ is chosen}
 			  	\STATE add pair $(f_j,e_i)$ to $list_{EF}$
 			\ENDFOR
 			\STATE add $list_{FE} \cup list_{EF}$ to $AlignedWords$
