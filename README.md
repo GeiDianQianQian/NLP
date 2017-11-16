@@ -13,3 +13,9 @@
 ### Homework 3 - Word Alignment
  - [README.lperesde](./aligner/answer/README.lperesde)
  - [README.tmosharr](./aligner/answer/README.tmosharr)
+
+### Homework 4 - Translation Decoding
+ - [README.lperesde](./decoder/answer/README.lperesde)
+ - [README.tmosharr](./decoder/answer/README.tmosharr)
+ - [README.sjjung](./aligner/answer/README.sjjung)
+ - [README.jylew](./aligner/answer/README.jylew)
