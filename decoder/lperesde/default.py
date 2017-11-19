@@ -2,7 +2,6 @@
 import optparse
 import sys
 import models
-import itertools
 from collections import namedtuple
 
 optparser = optparse.OptionParser()
@@ -60,23 +59,38 @@ for f in french:
     best = None
     prob = -1000
     
-    permutations = list(itertools.permutations(words))
-    for permutation in permutations:
-      arr = permutation
-      current_prob = -1000
-      while arr != ():
+    for i in range(len(words)-2):
+      arr = words
+      arr_cp = words
+      arr[i], arr[i+1] = arr[i+1], arr[i]
+      current_prob = 1000
+      while arr != []:
         states = tuple(arr[0:2]) if arr != None and arr[0:2] != None else ()
         w = arr[2] if arr != None and len(arr) > 2 else ""
         try:
+          #trigram
           (state, p) = lm.score(states, w)
           current_prob -= p
         except:
-          # get penalized
-          current_prob -= 6
+          #bigram
+          try:
+            (st1, p1) = lm.score(states[:-1], states[-1:])
+            (st2, p2) = lm.score(states[-1:], w)
+            current_prob -= (p1 + p2) / 2
+          except:
+            #unigram
+            try:
+              (st1, p1) = lm.score((), states[:-1])
+              (st2, p2) = lm.score((), states[-1:])
+              (st3, p3) = lm.score((), w)
+              current_prob -= (p1 + p2 + p2) / 3
+            except:
+              #penalize
+              current_prob -= 10
         arr = arr[2:len(arr)]
 
       if current_prob > prob:
-        best = permutation
+        best = arr_cp
         prob = current_prob
     return best
   
