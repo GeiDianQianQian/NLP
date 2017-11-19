@@ -2,6 +2,7 @@
 import optparse
 import sys
 import models
+import itertools
 from collections import namedtuple
 
 optparser = optparse.OptionParser()
@@ -49,9 +50,37 @@ for f in french:
             if lm_state not in stacks[j] or stacks[j][lm_state].logprob < logprob: # second case is recombination
               stacks[j][lm_state] = new_hypothesis 
   winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
-  def extract_english(h): 
+  
+  def extract_english(h):
     return "" if h.predecessor is None else "%s%s " % (extract_english(h.predecessor), h.phrase.english)
-  print extract_english(winner)
+  
+  def best_swap(h):
+    word = extract_english(h)
+    words = word.split()
+    best = None
+    prob = -1000
+    
+    permutations = list(itertools.permutations(words))
+    for permutation in permutations:
+      arr = permutation
+      current_prob = -1000
+      while arr != ():
+        states = tuple(arr[0:2]) if arr != None and arr[0:2] != None else ()
+        w = arr[2] if arr != None and len(arr) > 2 else ""
+        try:
+          (state, p) = lm.score(states, w)
+          current_prob -= p
+        except:
+          # get penalized
+          current_prob -= 6
+        arr = arr[2:len(arr)]
+
+      if current_prob > prob:
+        best = permutation
+        prob = current_prob
+    return best
+  
+  print " ".join(best_swap(winner))
 
   if opts.verbose:
     def extract_tm_logprob(h):
