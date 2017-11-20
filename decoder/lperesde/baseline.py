@@ -35,7 +35,7 @@ for f in french:
   stacks = [{} for _ in f] + [{}]
   stacks[0][lm.begin()] = initial_hypothesis
   for i, stack in enumerate(stacks[:-1]):
-    for h in sorted(stack.itervalues(),key=lambda h: -h.logprob)[:opts.s]: # prune
+    for h in sorted(stack.itervalues(),key=lambda h: -h.logprob)[:5]: # prune
       for j in xrange(i+1,len(f)+1):
         if f[i:j] in tm:
           for phrase in tm[f[i:j]]:
@@ -47,11 +47,37 @@ for f in french:
             logprob += lm.end(lm_state) if j == len(f) else 0.0
             new_hypothesis = hypothesis(logprob, lm_state, h, phrase)
             if lm_state not in stacks[j] or stacks[j][lm_state].logprob < logprob: # second case is recombination
-              stacks[j][lm_state] = new_hypothesis 
+              stacks[j][lm_state] = new_hypothesis
   winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
+
+  def extract_english_phrases(h, arr):
+    if h.predecessor is None:
+      return arr
+    else:
+      arr.append(h.phrase.english)
+      return extract_english_phrases(h.predecessor, arr)
+
   def extract_english(h): 
     return "" if h.predecessor is None else "%s%s " % (extract_english(h.predecessor), h.phrase.english)
-  print extract_english(winner)
+
+  def score(arr):
+    logprob = 0.0
+    arr.insert(0, lm.begin()[0])
+    for i, word in enumerate(arr[:-1]):
+      (lm_state, word_logprob) = lm.score(tuple(word.split()), arr[i+1])
+      logprob += word_logprob
+    logprob += lm.end(tuple(arr[-1]))
+    return logprob
+
+  def improve(h):
+    current = extract_english_phrases(winner, [])[::-1]
+    while True:
+      s_current = score(current)
+      s = s_current
+      break
+    return current
+
+  print " ".join(improve(winner))
 
   if opts.verbose:
     def extract_tm_logprob(h):
