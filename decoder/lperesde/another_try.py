@@ -30,8 +30,8 @@ for f in french:
   # Hence all hypotheses in stacks[i] represent translations of 
   # the first i words of the input sentence. You should generalize
   # this so that they can represent translations of *any* i words.
-  hypothesis = namedtuple("hypothesis", "logprob, lm_state, predecessor, phrase")
-  initial_hypothesis = hypothesis(0.0, lm.begin(), None, None)
+  hypothesis = namedtuple("hypothesis", "logprob, lm_state, predecessor, phrase, f")
+  initial_hypothesis = hypothesis(0.0, lm.begin(), None, None, None)
   stacks = [{} for _ in f] + [{}]
   stacks[0][lm.begin()] = initial_hypothesis
   for i, stack in enumerate(stacks[:-1]):
@@ -45,17 +45,17 @@ for f in french:
               (lm_state, word_logprob) = lm.score(lm_state, word)
               logprob += word_logprob
             logprob += lm.end(lm_state) if j == len(f) else 0.0
-            new_hypothesis = hypothesis(logprob, lm_state, h, phrase)
+            new_hypothesis = hypothesis(logprob, lm_state, h, phrase, f[i:j])
             if lm_state not in stacks[j] or stacks[j][lm_state].logprob < logprob: # second case is recombination
               stacks[j][lm_state] = new_hypothesis
   winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
-  def extract_english_phrases(h, arr):
+  def extract_english_phrases(h, arr, english):
     if h.predecessor is None:
       return arr
     else:
-      arr.append(h.phrase.english)
-      return extract_english_phrases(h.predecessor, arr)
+      arr.append(h.phrase.english) if english else arr.append(h.f)
+      return extract_english_phrases(h.predecessor, arr, english)
 
   def extract_english(h): 
     return "" if h.predecessor is None else "%s%s " % (extract_english(h.predecessor), h.phrase.english)
@@ -76,8 +76,8 @@ for f in french:
     best = arr[:]
     bests = s
     changed = False
-    for i in range(len(arr[:-1])):
-      for j in xrange(i+1, len(arr)):
+    for i in range(len(arr[:-2])):
+      for j in xrange(i+1, len(arr[:-1])):
         aux = arr[:]
         aux[i], aux[j] = aux[j], aux[i]
         sc = score(aux)
@@ -85,13 +85,14 @@ for f in french:
             bests = sc
             best = aux[:]
             changed = True
-    return (best, changed)
+    return (best, bests, changed)
 
   def improve(h):
-    current = extract_english_phrases(winner, [])[::-1]
+    current  = extract_english_phrases(winner, [], True)[::-1]
+    #currentF = extract_english_phrases(winner, [], False)[::-1]
     while True:
       s_current = score(current)
-      (current, c1) = swap(current, s_current)
+      (current, s_current, c1) = swap(current, s_current)
       if not c1:
         break
     return current
