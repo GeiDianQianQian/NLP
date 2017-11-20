@@ -62,19 +62,51 @@ for f in french:
 
   def score(arr):
     logprob = 0.0
-    arr.insert(0, lm.begin()[0])
-    for i, word in enumerate(arr[:-1]):
-      (lm_state, word_logprob) = lm.score(tuple(word.split()), arr[i+1])
-      logprob += word_logprob
-    logprob += lm.end(tuple(arr[-1]))
+    auxArr = arr[:]
+    auxArr.insert(0, lm.begin()[0])
+    for i, word in enumerate(auxArr[:-1]):
+      try:
+        (lm_state, word_logprob) = lm.score(tuple(word.split()[-2:]), auxArr[i+1].split()[0])
+        logprob += word_logprob
+      except:
+        logprob += -6
+    try:
+      logprob += lm.end(tuple(auxArr[-1]))
+    except:
+      logprob += 0.0
     return logprob
+
+  def remove(arr, s):
+    for i, _ in enumerate(arr[:-2]):
+      aux = arr[:]
+      sc1 = score(aux[i:i+2])
+      del aux[i]
+      sc2 = score(aux[i-1:i+1])
+      sc  = score(aux)
+      if (sc2 < sc1 and sc > s + 5):
+        return (aux, True)
+    return (arr, False)
+
+  def swap(arr, s):
+    best = arr[:]
+    aux = arr[:]
+    changed = False
+    for i, _ in enumerate(arr[:-1]):
+      for j, _ in enumerate(arr[:-1]):
+        aux[i], aux[j+1] = aux[j+1], aux[i]
+        if (score(aux) > s):
+          best = aux[:]
+          changed = True
+    return (best, changed)
 
   def improve(h):
     current = extract_english_phrases(winner, [])[::-1]
     while True:
       s_current = score(current)
-      s = s_current
-      break
+      (current, c1) = swap(current, s_current)
+      (current, c2) = remove(current, s_current)
+      if not c1 or not c2:
+        break
     return current
 
   print " ".join(improve(winner))
