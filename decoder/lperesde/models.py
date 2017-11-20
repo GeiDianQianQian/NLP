@@ -17,9 +17,9 @@ def TM(filename, k):
   for line in open(filename).readlines():
     (f, e, logprob) = line.strip().split(" ||| ")
     tm.setdefault(tuple(f.split()), []).append(phrase(e, float(logprob)))
-  for f in tm: # prune all but top k translations
-    tm[f].sort(key=lambda x: -x.logprob)
-    del tm[f][k:] 
+  #for f in tm: # prune all but top k translations
+    #tm[f].sort(key=lambda x: -x.logprob)
+    #del tm[f][k:] 
   return tm
 
 # # A language model scores sequences of English words, and must account
