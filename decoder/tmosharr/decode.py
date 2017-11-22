@@ -7,11 +7,11 @@ from collections import defaultdict
 import itertools
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="../data/input",
+optparser.add_option("-i", "--input", dest="input", default="data/input_small",
                      help="File containing sentences to translate (default=data/input)")
-optparser.add_option("-t", "--translation-model", dest="tm", default="../data/tm",
+optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm",
                      help="File containing translation model (default=data/tm)")
-optparser.add_option("-l", "--language-model", dest="lm", default="../data/lm",
+optparser.add_option("-l", "--language-model", dest="lm", default="data/lm",
                      help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
@@ -170,7 +170,7 @@ for f in french:
     stacks = [{} for _ in f] + [{}]
     stacks[0][lm.begin()] = initial_hypothesis
     for i, stack in enumerate(stacks[:-1]):
-        for h in sorted(stack.itervalues(), key=lambda h: -h.logprob)[:opts.s]:  # prune
+        for h in sorted(stack.itervalues(), key=lambda h: -h.logprob):
             for j in xrange(i + 1, len(f) + 1):
                 if f[i:j] in tm:
                     for phrase in tm[f[i:j]]:

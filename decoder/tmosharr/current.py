@@ -6,7 +6,7 @@ from collections import namedtuple
 from collections import defaultdict
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/input",
+optparser.add_option("-i", "--input", dest="input", default="data/input_small",
                      help="File containing sentences to translate (default=data/input)")
 optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm",
                      help="File containing translation model (default=data/tm)")
@@ -18,8 +18,8 @@ optparser.add_option("-k", "--translations-per-phrase", dest="k", default=1, typ
                      help="Limit on number of translations to consider per phrase (default=1)")
 optparser.add_option("-s", "--stack-size", dest="s", default=10, type="int", help="Maximum stack size (default=1)")
 optparser.add_option("-d", "--distortion-limit", dest="d", default=4, type="int", help="Distortion limit (default=5)")
-optparser.add_option("-y", "--distortion-penalty", dest="y", default=-10, type="float",
-                     help="Distortion penalty (default=-2)")
+optparser.add_option("-y", "--distortion-penalty", dest="y", default=-2, type="float",
+                     help="Distortion penalty (default=-1)")
 optparser.add_option("-w", "--beam-width", dest="beam_width", default=0.5, type="float",
                      help="Beam width (default=1)")
 optparser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
@@ -139,8 +139,8 @@ def ph(h, all_p_phrases):
             for i in range(start, end + 1):
                 if h.bitmap[i]:
                     valid = False
-                    # if abs(h.end + 1 - start) > opts.d:
-                    # valid = False
+                    if abs(h.end + 1 - start) > opts.d:
+                        valid = False
             if valid:
                 s.append(p_phrase)
     return s
@@ -151,11 +151,11 @@ def get_next_hypothesis(h, p, lm):
     logprob = h.logprob + p.logprob
     start = p.start
     end = p.end
-    lm_state = lm.begin()
+    lm_state = h.lm_state
     for english_word in english.split():
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
-    logprob += lm.end(lm_state)
+    #logprob += lm.end(lm_state)
     logprob += opts.y * abs(h.end + 1 - start)
     bits = h.bitmap[:]
     for i in range(start, end + 1):
@@ -220,6 +220,7 @@ for num, f in enumerate(french):
     e_phrases=extract_english_phrases(winner, [], len(f))
 
     print " ".join(improve(e_phrases))
+    #print " ".join(e_phrases)
 
     if opts.verbose:
         tm_logprob = extract_tm_logprob(winner)
