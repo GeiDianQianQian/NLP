@@ -14,11 +14,11 @@ optparser.add_option("-l", "--language-model", dest="lm", default="data/lm",
                      help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
-optparser.add_option("-k", "--translations-per-phrase", dest="k", default=1, type="int",
+optparser.add_option("-k", "--translations-per-phrase", dest="k", default=20, type="int",
                      help="Limit on number of translations to consider per phrase (default=1)")
-optparser.add_option("-s", "--stack-size", dest="s", default=10, type="int", help="Maximum stack size (default=1)")
-optparser.add_option("-d", "--distortion-limit", dest="d", default=0, type="int", help="Distortion limit (default=5)")
-optparser.add_option("-y", "--distortion-penalty", dest="y", default=-1000, type="float",
+optparser.add_option("-s", "--stack-size", dest="s", default=1000, type="int", help="Maximum stack size (default=1)")
+optparser.add_option("-d", "--distortion-limit", dest="d", default=3, type="int", help="Distortion limit (default=5)")
+optparser.add_option("-y", "--distortion-penalty", dest="y", default=-1, type="float",
                      help="Distortion penalty (default=-1)")
 optparser.add_option("-w", "--beam-width", dest="beam_width", default=54.9, type="float",
                      help="Beam width (default=1)")
@@ -286,7 +286,7 @@ for num, f in enumerate(french):
             ps = ph(h, all_p_phrases)
 
             for m, next_p_phrase in enumerate(ps):
-                # print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
+                #print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
                 next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
                 # print((i, next_p_phrase.start, next_p_phrase.end, j))
