@@ -95,7 +95,7 @@ def swap(arr, s):
 
 
 def improve(current):
-    current=current[::-1]
+    current = current[::-1]
     while True:
         s_current = sequence_score(current)
         (current, s_current, c1) = swap(current, s_current)
@@ -169,12 +169,12 @@ def ph(h, all_p_phrases):
 
             start = p_phrase.start
             end = p_phrase.end
-            #print((start, end))
-            #print 'here'
+            # print((start, end))
+            # print 'here'
             if abs(h.end + 1 - start) > opts.d:
                 break
-            #print((start, end))
-            valid=True
+            # print((start, end))
+            valid = True
             for i in range(start, end + 1):
                 if h.bitmap[i]:
                     valid = False
@@ -282,22 +282,21 @@ for num, f in enumerate(french):
         sys.stderr.write(".")
         bm = beam(stack)
         for g, h in enumerate(bm):
-            #print(i)
+            # print(i)
             ps = ph(h, all_p_phrases)
 
             for m, next_p_phrase in enumerate(ps):
-
-                #print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
+                # print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
                 next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
-                #print((i, next_p_phrase.start, next_p_phrase.end, j))
+                # print((i, next_p_phrase.start, next_p_phrase.end, j))
                 stacks[j] = add_to_stack(stacks[j], next_hypothesis)
 
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
     e_phrases = extract_english_phrases(winner, [], len(f))
     print " ".join(improve(e_phrases))
-    #print " ".join(e_phrases)
+    # print " ".join(e_phrases)
 
     if opts.verbose:
         tm_logprob = extract_tm_logprob(winner)
