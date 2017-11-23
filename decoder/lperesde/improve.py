@@ -84,8 +84,8 @@ def get_all_phrases(f):
     return all_phrases
 
 
-def update_stacks(position, h, phrase, word_tuple, is_end, stacks):
-    logprob = h.logprob + phrase.logprob
+def update_stacks(position, h, phrase, word_tuple, is_end, stacks, distortion):
+    logprob = h.logprob + phrase.logprob + (-2 * abs(distortion + 1))
     lm_state = h.lm_state
     for word in phrase.english.split():
         (lm_state, word_logprob) = lm.score(lm_state, word)
@@ -142,11 +142,11 @@ def swap(arr, s):
 def improve(winner):
     current = extract_english_phrases(winner, [], True)[::-1]
     # currentF = extract_english_phrases(winner, [], False)[::-1]
-    # while True:
-    #     s_current = score(current)
-    #     (current, s_current, c1) = swap(current, s_current)
-    #     if not c1:
-    #        break
+    while True:
+        s_current = score(current)
+        (current, s_current, c1) = swap(current, s_current)
+        if not c1:
+           break
     return current
 
 
@@ -174,7 +174,7 @@ for f in french:
             for j in xrange(i + 1, len(f)+1):
                 if f[i:j] in tm:
                     for phrase in tm[f[i:j]]:
-                        stacks = update_stacks(j, h, phrase, f[i:j], j == len(f), stacks)
+                        stacks = update_stacks(j, h, phrase, f[i:j], j == len(f), stacks, -1)
             for j in xrange(i + 2, len(f)):
                 if (j - 5) > 4: #condition of distortion
                     break
@@ -183,7 +183,7 @@ for f in french:
                 tNewF = tuple(newF)
                 if tNewF[i:j] in tm:
                   for phrase in tm[tNewF[i:j]]:
-                      stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks)
+                      stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks, i-j)
             for j in xrange(i + 3, len(f)):
                 if (j - 5) > 4: #condition of distortion
                     break
@@ -194,7 +194,7 @@ for f in french:
                     tNewF = tuple(list(perm)+newF[i+3:len(newF)])
                     if tNewF[i:j] in tm:
                         for phrase in tm[tNewF[i:j]]:
-                            stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks)
+                            stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks, i-j)
 
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
     w = improve(winner)
