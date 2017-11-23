@@ -4,7 +4,7 @@ import sys
 import models
 from collections import namedtuple
 from collections import defaultdict
-import itertools
+from itertools import permutations
 
 optparser = optparse.OptionParser()
 optparser.add_option("-i", "--input", dest="input", default="../data/input",
@@ -84,7 +84,7 @@ def get_all_phrases(f):
     return all_phrases
 
 
-def update_stacks(position, h, phrase, word_tuple, is_end):
+def update_stacks(position, h, phrase, word_tuple, is_end, stacks):
     logprob = h.logprob + phrase.logprob
     lm_state = h.lm_state
     for word in phrase.english.split():
@@ -142,11 +142,11 @@ def swap(arr, s):
 def improve(winner):
     current = extract_english_phrases(winner, [], True)[::-1]
     # currentF = extract_english_phrases(winner, [], False)[::-1]
-    while True:
-        s_current = score(current)
-        (current, s_current, c1) = swap(current, s_current)
-        if not c1:
-            break
+    # while True:
+    #     s_current = score(current)
+    #     (current, s_current, c1) = swap(current, s_current)
+    #     if not c1:
+    #        break
     return current
 
 
@@ -164,17 +164,37 @@ for word in set(sum(french, ())):
 sys.stderr.write("Decoding %s...\n" % (opts.input,))
 
 for f in french:
-    all_phrases = get_all_phrases(f)
+    #all_phrases = get_all_phrases(f)
     hypothesis = namedtuple("hypothesis", "logprob, lm_state, predecessor, phrase, f, end, bitmap")
     initial_hypothesis = hypothesis(0.0, lm.begin(), None, None, None, 0, [False]*len(f))
     stacks = [{} for _ in f] + [{}]
     stacks[0][lm.begin()] = initial_hypothesis
     for i, stack in enumerate(stacks[:-1]):
         for h in sorted(stack.itervalues(), key=lambda h: -h.logprob):
-            for j in xrange(i + 1, len(f) + 1):
+            for j in xrange(i + 1, len(f)+1):
                 if f[i:j] in tm:
                     for phrase in tm[f[i:j]]:
-                        stacks = update_stacks(j, h, phrase, f[i:j], j == len(f))
+                        stacks = update_stacks(j, h, phrase, f[i:j], j == len(f), stacks)
+            for j in xrange(i + 2, len(f)):
+                if (j - 5) > 4: #condition of distortion
+                    break
+                newF = list(f[:])
+                newF[i], newF[j] = newF[j], newF[i] #swap i and j
+                tNewF = tuple(newF)
+                if tNewF[i:j] in tm:
+                  for phrase in tm[tNewF[i:j]]:
+                      stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks)
+            for j in xrange(i + 3, len(f)):
+                if (j - 5) > 4: #condition of distortion
+                    break
+                newF = list(f[:])
+                newF[i], newF[j] = newF[j], newF[i] #swap i and j
+                perms = permutations(newF[i:i+3])
+                for _, perm in enumerate(perms):
+                    tNewF = tuple(list(perm)+newF[i+3:len(newF)])
+                    if tNewF[i:j] in tm:
+                        for phrase in tm[tNewF[i:j]]:
+                            stacks = update_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks)
 
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
     w = improve(winner)
