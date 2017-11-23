@@ -115,16 +115,32 @@ def get_hypothesis_length(h):
 
 def get_all_phrases(f, tm):
     all_p_phrases = defaultdict(list)
+    all_future_score = defaultdict(float)
     length = len(f)
     for i in range(length):
         for j in range(i + 1, length + 1):
             sub_tuple = f[i:j]
             if sub_tuple in tm.keys():
+                bst = -1000
                 list_of_phrases = tm[sub_tuple]
                 for phrase in list_of_phrases:
                     new_p_phrase = p_phrase(i, j - 1, phrase.english, phrase.logprob)
                     all_p_phrases[(i, j - 1)].append(new_p_phrase)
-    return all_p_phrases
+                    lg = phrase.logprob
+                    st = lm.begin()
+                    for word in phrase.english.split():
+                        st, prob = lm.score(st, word)
+                        lg += prob
+                    lg+=lm.end(st)
+                    if lg > bst:
+                        bst=lg
+                all_future_score[(i, j-1)] = bst
+            elif j-i==1:
+                _, prob=lm.score(st, "<unk>")
+                prob+=lm.end(st)
+                all_future_score[(i, j - 1)] = prob
+
+    return all_future_score, all_p_phrases
 
 
 def ph(h, all_p_phrases):
@@ -155,7 +171,7 @@ def get_next_hypothesis(h, p, lm):
     for english_word in english.split():
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
-    #logprob += lm.end(lm_state)
+    # logprob += lm.end(lm_state)
     logprob += opts.y * abs(h.end + 1 - start)
     bits = h.bitmap[:]
     for i in range(start, end + 1):
@@ -201,7 +217,19 @@ for word in set(sum(french, ())):
 sys.stderr.write("Decoding %s...\n" % (opts.input,))
 for num, f in enumerate(french):
     sys.stderr.write("\nDecoding: %s\n" % (num,))
-    all_p_phrases = get_all_phrases(f, tm)
+    all_future_score, all_p_phrases = get_all_phrases(f, tm)
+    print all_future_score[(2,2)]
+    future_score_matrix = [[None] * len(f) for i in range(len(f))]
+    for j in range(len(f)):
+        for i in range(len(f)-j):
+            if j==0:
+                future_score_matrix[i][j]=all_future_score.get((i, j+i),-1000)
+            elif j==1:
+                future_score_matrix[i][j]= max([all_future_score.get((i, j+i),-1000), future_score_matrix[i][j-1]+future_score_matrix[i+1][j-1]])
+            else:
+                future_score_matrix[i][j]= max([all_future_score.get((i, j+i),-1000), future_score_matrix[i][j-1]+future_score_matrix[j][0], future_score_matrix[i+1][j-1]+future_score_matrix[0][0]])
+    for i in range(len(f)):
+        print(future_score_matrix[i])
     initial_hypothesis = hypothesis(lm.begin(), [False] * len(f), 0, 0.0, None, None)
     stacks = [{} for _ in f] + [{}]
     stacks[0][lm.begin()] = initial_hypothesis
@@ -217,10 +245,10 @@ for num, f in enumerate(french):
 
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
-    e_phrases=extract_english_phrases(winner, [], len(f))
+    e_phrases = extract_english_phrases(winner, [], len(f))
 
     print " ".join(improve(e_phrases))
-    #print " ".join(e_phrases)
+    # print " ".join(e_phrases)
 
     if opts.verbose:
         tm_logprob = extract_tm_logprob(winner)
