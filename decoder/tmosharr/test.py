@@ -23,6 +23,24 @@ def get_list_of_phrases(phrase):
 
 phrase_1=models.phrase('i will be there', 0.03)
 phrases=get_list_of_phrases(phrase_1)
-for phrase in phrases:
-    print(phrase.english)
-    print(phrase.logprob)
+#for phrase in phrases:
+    #print(phrase.english)
+
+bits=[False, True,False, True, False, False, True, True, False, False]
+
+borders = []
+on = True
+strt = 0
+en = 0
+# future cost
+for i, bit in enumerate(bits):
+    if on == True and bit == False:
+        strt = i
+        on = False
+    if on == False and bit == True:
+        end = i - 1
+        on = True
+        borders.append((strt, end-strt))
+if on==False:
+    borders.append((strt,len(bits)-1-strt))
+print borders

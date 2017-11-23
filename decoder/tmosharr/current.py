@@ -6,7 +6,7 @@ from collections import namedtuple
 from collections import defaultdict
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/input_small",
+optparser.add_option("-i", "--input", dest="input", default="data/input",
                      help="File containing sentences to translate (default=data/input)")
 optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm",
                      help="File containing translation model (default=data/tm)")
@@ -17,10 +17,10 @@ optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxi
 optparser.add_option("-k", "--translations-per-phrase", dest="k", default=1, type="int",
                      help="Limit on number of translations to consider per phrase (default=1)")
 optparser.add_option("-s", "--stack-size", dest="s", default=10, type="int", help="Maximum stack size (default=1)")
-optparser.add_option("-d", "--distortion-limit", dest="d", default=4, type="int", help="Distortion limit (default=5)")
-optparser.add_option("-y", "--distortion-penalty", dest="y", default=-2, type="float",
+optparser.add_option("-d", "--distortion-limit", dest="d", default=0, type="int", help="Distortion limit (default=5)")
+optparser.add_option("-y", "--distortion-penalty", dest="y", default=-1000, type="float",
                      help="Distortion penalty (default=-1)")
-optparser.add_option("-w", "--beam-width", dest="beam_width", default=0.5, type="float",
+optparser.add_option("-w", "--beam-width", dest="beam_width", default=54.9, type="float",
                      help="Beam width (default=1)")
 optparser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
                      help="Verbose mode (default=off)")
@@ -29,10 +29,10 @@ opts = optparser.parse_args()[0]
 tm = models.TM(opts.tm, opts.k)
 lm = models.LM(opts.lm)
 p_phrase = namedtuple("p_phrase", "start, end, english, logprob")
-hypothesis = namedtuple("hypothesis", "lm_state, bitmap, end, logprob, predecessor, last_phrase")
+hypothesis = namedtuple("hypothesis", "lm_state, bitmap, end, logprob, predecessor, last_phrase, future_cost")
 french = [tuple(line.strip().split()) for line in open(opts.input).readlines()[:opts.num_sents]]
 
-
+'''
 def extract_english_phrases(h, word_list, length):
     arr1 = [None] * length
     while (True):
@@ -50,6 +50,19 @@ def extract_english_phrases(h, word_list, length):
         if phrase is not None:
             arr2.append(phrase)
     return arr2
+'''
+
+
+def extract_english_phrases(h, phrase_list, length):
+    while (True):
+        if h.last_phrase is None:
+            break
+        phrase_list.append(h.last_phrase.english)
+        if h.predecessor is not None:
+            h = h.predecessor
+        else:
+            break
+    return phrase_list
 
 
 def sequence_score(arr):
@@ -82,6 +95,7 @@ def swap(arr, s):
 
 
 def improve(current):
+    current=current[::-1]
     while True:
         s_current = sequence_score(current)
         (current, s_current, c1) = swap(current, s_current)
@@ -95,13 +109,15 @@ def extract_tm_logprob(h):
 
 
 def beam(stack):
-    bests = sorted(stack.itervalues(), key=lambda h: -h.logprob)
+    bests = sorted(stack.itervalues(), key=lambda h: -(h.future_cost))
     maxp = bests[0].logprob
     min_allowable = maxp - opts.beam_width
-    bm = []
+    bm = bests[:opts.s]
+    '''
     for h in bests:
-        if h.logprob >= min_allowable:
+        if h.future_cost >= min_allowable:
             bm.append(h)
+    '''
     return bm
 
 
@@ -131,13 +147,13 @@ def get_all_phrases(f, tm):
                     for word in phrase.english.split():
                         st, prob = lm.score(st, word)
                         lg += prob
-                    lg+=lm.end(st)
+                    lg += lm.end(st)
                     if lg > bst:
-                        bst=lg
-                all_future_score[(i, j-1)] = bst
-            elif j-i==1:
-                _, prob=lm.score(st, "<unk>")
-                prob+=lm.end(st)
+                        bst = lg
+                all_future_score[(i, j - 1)] = bst
+            elif j - i == 1:
+                _, prob = lm.score(st, "<unk>")
+                prob += lm.end(st)
                 all_future_score[(i, j - 1)] = prob
 
     return all_future_score, all_p_phrases
@@ -145,24 +161,30 @@ def get_all_phrases(f, tm):
 
 def ph(h, all_p_phrases):
     s = []
+
     keys = all_p_phrases.keys()
     for key in keys:
         p_phrase_list = all_p_phrases[key]
         for p_phrase in p_phrase_list:
+
             start = p_phrase.start
             end = p_phrase.end
-            valid = True
+            #print((start, end))
+            #print 'here'
+            if abs(h.end + 1 - start) > opts.d:
+                break
+            #print((start, end))
+            valid=True
             for i in range(start, end + 1):
                 if h.bitmap[i]:
                     valid = False
-                    if abs(h.end + 1 - start) > opts.d:
-                        valid = False
+                    break
             if valid:
                 s.append(p_phrase)
     return s
 
 
-def get_next_hypothesis(h, p, lm):
+def get_next_hypothesis(h, p, lm, len_f):
     english = p.english
     logprob = h.logprob + p.logprob
     start = p.start
@@ -171,13 +193,32 @@ def get_next_hypothesis(h, p, lm):
     for english_word in english.split():
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
-    # logprob += lm.end(lm_state)
+    logprob += lm.end(lm_state) if end >= len_f - 1 else 0.0
     logprob += opts.y * abs(h.end + 1 - start)
     bits = h.bitmap[:]
     for i in range(start, end + 1):
         bits[i] = True
     r = end
-    new_hypothesis = hypothesis(lm_state, bits, r, logprob, h, p)
+    borders = []
+    on = True
+    strt = 0
+    en = 0
+    future_score = 0.0
+    # future cost
+    for i, bit in enumerate(bits):
+        if on == True and bit == False:
+            strt = i
+            on = False
+        if on == False and bit == True:
+            end = i - 1
+            on = True
+            borders.append((strt, end - strt))
+    if on == False:
+        borders.append((strt, len(bits) - 1 - strt))
+    # print borders
+    for (srt, span) in borders:
+        future_score += future_score_matrix[srt][span]
+    new_hypothesis = hypothesis(lm_state, bits, r, logprob, h, p, logprob + future_score)
     return new_hypothesis
 
 
@@ -218,37 +259,45 @@ sys.stderr.write("Decoding %s...\n" % (opts.input,))
 for num, f in enumerate(french):
     sys.stderr.write("\nDecoding: %s\n" % (num,))
     all_future_score, all_p_phrases = get_all_phrases(f, tm)
-    print all_future_score[(2,2)]
     future_score_matrix = [[None] * len(f) for i in range(len(f))]
     for j in range(len(f)):
-        for i in range(len(f)-j):
-            if j==0:
-                future_score_matrix[i][j]=all_future_score.get((i, j+i),-1000)
-            elif j==1:
-                future_score_matrix[i][j]= max([all_future_score.get((i, j+i),-1000), future_score_matrix[i][j-1]+future_score_matrix[i+1][j-1]])
+        for i in range(len(f) - j):
+            if j == 0:
+                future_score_matrix[i][j] = all_future_score.get((i, j + i), -1000)
+            elif j == 1:
+                future_score_matrix[i][j] = max([all_future_score.get((i, j + i), -1000),
+                                                 future_score_matrix[i][j - 1] + future_score_matrix[i + 1][j - 1]])
             else:
-                future_score_matrix[i][j]= max([all_future_score.get((i, j+i),-1000), future_score_matrix[i][j-1]+future_score_matrix[j][0], future_score_matrix[i+1][j-1]+future_score_matrix[0][0]])
-    for i in range(len(f)):
-        print(future_score_matrix[i])
-    initial_hypothesis = hypothesis(lm.begin(), [False] * len(f), 0, 0.0, None, None)
+                future_score_matrix[i][j] = max(
+                    [all_future_score.get((i, j + i), -1000), future_score_matrix[i][j - 1] + future_score_matrix[j][0],
+                     future_score_matrix[i + 1][j - 1] + future_score_matrix[0][0]])
+                # for i in range(len(f)):
+                # print(future_score_matrix[i])
+    initial_hypothesis = hypothesis(lm.begin(), [False] * len(f), -1, 0.0, None, None,
+                                    future_score_matrix[0][len(f) - 1])
     stacks = [{} for _ in f] + [{}]
     stacks[0][lm.begin()] = initial_hypothesis
 
     for i, stack in enumerate(stacks[:-1]):
         sys.stderr.write(".")
-        for h in beam(stack):
+        bm = beam(stack)
+        for g, h in enumerate(bm):
+            #print(i)
             ps = ph(h, all_p_phrases)
-            for next_p_phrase in ps:
-                next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm)
+
+            for m, next_p_phrase in enumerate(ps):
+
+                #print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
+                next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
+                #print((i, next_p_phrase.start, next_p_phrase.end, j))
                 stacks[j] = add_to_stack(stacks[j], next_hypothesis)
 
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
     e_phrases = extract_english_phrases(winner, [], len(f))
-
     print " ".join(improve(e_phrases))
-    # print " ".join(e_phrases)
+    #print " ".join(e_phrases)
 
     if opts.verbose:
         tm_logprob = extract_tm_logprob(winner)
