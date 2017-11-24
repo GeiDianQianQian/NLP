@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage{algorithm2e}
+\begin{document}
+\begin{titlepage}
+	\title{CMPT 413/825 Assignment 4}
+	\author{Turash, Luiz, Jin, Justin}
+	\maketitle
+\end{titlepage}
+
+\section{Brief Description of the Algorithm}
+	The algorithm implemented in assignment 4 for the translation decoding task is based on the decoding algorithm for phrase-based models in the paper by Michael Collins called "Phrase-Based Translation Models."
+	
+	Briefly, the algorithm uses phrase-based lexicons which are a set of lexical tuples of the form (f, e, g) where f is a sequence of one or more words of the foreign word (in our case, the language of interest is French), e is the sequence of one or words of English, and g is the scoring which is a real number.
+	
+	We can then learn a phrase-based lexicon by training IBM Model 2, by using the expectation-maximization algorithm based on the alignment task from assignment 3. From this, we derive an alignment matrix for each French-English sentence pair.
+	
+	After finding all consistent lexical tuples of sequence of French words and sequence of English words, we calculate the score g, 
+	\[g(e, f) = log \frac{count(e, f)}{count(e)}\]
+	 
+	 where f is the sequence of French words, and e is the sequence of English words.
+	 
+	 A phrase is defined as a 3-tuple (s, t, e) where $1 \leq s \leq t \leq n$, and s and t denote the start and end word index, respectively, of the French sentence $x_{1}, x_{2}, ... , x_{n}$ of length n. e is defined as the translation of the ordered French word sequence $ x_{s}, ..., x_{t} $  to English.
+	 
+	 We found the set of all derivations, denoted $ \Upsilon (x)$, as the set of all valid derivations for an input sentence x, which in our case is in French. It is the set of sequences of phrases, say $p_{1}p_{2}\cdots p_{n}$ where all $p_{i}$'s are lexical tuples defined above, each word in x is translated once, and the distance between lexical tuples are from each other is limited by the distortion parameter $\eta$.
+	 
+	 After finding the set of all valid derivations $ \Upsilon (x) $, we score each derivation in the set$\Upsilon (x)$ for all sentences x by taking the arg max, \[\arg \max_{y \in \Upsilon (x)}  f(y)\]
+	 where \[f(y) = h(e(y)) + \sum_{k=1}^{L}g(p_k) + \sum_{k=1}^{L-1} \eta \times  |t(p_k) + 1 - s(p_{k+1})| \]
+	 
+\newpage
+\section{Pseudocode of the Algorithm}
+
+\begin{algorithm}[H]
+	\KwData{French sentences}
+	\KwResult{English translation using the model}
+	Initialize hypothesis as binary tuple;
+	Initialize stack, with first entry as hypothesis;
+	
+	
+\end{algorithm}
+\end{document}
