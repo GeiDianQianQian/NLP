@@ -31,9 +31,9 @@ def logadd10(x,y):
   return x + math.log10(1 + pow(10,y-x))
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/input", help="File containing sentences to translate (default=data/input)")
-optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm", help="File containing translation model (default=data/tm)")
-optparser.add_option("-l", "--language-model", dest="lm", default="data/lm", help="File containing ARPA-format language model (default=data/lm)")
+optparser.add_option("-i", "--input", dest="input", default="../data/input", help="File containing sentences to translate (default=data/input)")
+optparser.add_option("-t", "--translation-model", dest="tm", default="../data/tm", help="File containing translation model (default=data/tm)")
+optparser.add_option("-l", "--language-model", dest="lm", default="../data/lm", help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-v", "--verbosity", dest="verbosity", default=1, type="int", help="Verbosity level, 0-3 (default=1)")
 optparser.add_option("-o", "--logfile", dest="logfile", default=None, help="filename for logging output")
 opts = optparser.parse_args()[0]
