@@ -282,9 +282,8 @@ for num, f in enumerate(french):
         sys.stderr.write(".")
         bm = beam(stack)
         for g, h in enumerate(bm):
-            # print(i)
             ps = ph(h, all_p_phrases)
-	    sys.stderr.write(str(num)+ " " +str(i)+ " " + str(len(stacks[:-1])) + " " +str(g)+ " " +str(len(bm))+ "\n")
+            sys.stderr.write(str(num)+ " " +str(i)+ " " + str(len(stacks[:-1])) + " " +str(g)+ " " +str(len(bm))+ "\n")
             for m, next_p_phrase in enumerate(ps):
                 next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
