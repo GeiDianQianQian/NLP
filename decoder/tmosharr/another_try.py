@@ -3,6 +3,7 @@ import optparse
 import sys
 import models
 from collections import namedtuple
+import itertools
 
 optparser = optparse.OptionParser()
 optparser.add_option("-i", "--input", dest="input", default="../data/input",
@@ -88,29 +89,16 @@ for num, f in enumerate(french):
         bests = s
         changed = False
         perms=[]
-        for i in range(len(arr[:-4])):
-            for j in xrange(i + 1, len(arr[:-3])):
-                for k in xrange(j + 1, len(arr[:-2])):
-                    for l in xrange(k + 1, len(arr[:-1])):
-                        aux = arr[:]
-                        aux[i], aux[j], aux[k] = aux[i], aux[k], aux[j]
-                        perms.append(aux0)
-
-                        aux = arr[:]
-                        aux[i], aux[j], aux[k] = aux[j], aux[i], aux[k]
-                        perms.append(aux1)
-
-                        aux = arr[:]
-                        aux[i], aux[j], aux[k] = aux[j], aux[k], aux[i]
-                        perms.append(aux2)
-
-                        aux = arr[:]
-                        aux[i], aux[j], aux[k] = aux[k], aux[i], aux[j]
-                        perms.append(aux)
-
-                        aux = arr[:]
-                        aux[i], aux[j], aux[k] = aux[k], aux[j], aux[i]
-                        perms.append(aux4)
+        for i in range(len(arr[:-5])):
+            for j in xrange(i + 1, len(arr[:-4])):
+                for k in xrange(j + 1, len(arr[:-3])):
+                    for l in xrange(k + 1, len(arr[:-2])):
+                        ind_array=[i, j, k, l]
+                        permutations = list(itertools.permutations(ind_array, len(ind_array)))
+                        for n in permutations:
+                            aux = arr[:]
+                            aux[i], aux[j], aux[k], aux[l] = aux[n[0]], aux[n[1]], aux[n[2]], aux[n[3]]
+                            perms.append(aux)
 
         best = arr[:]
         bests = s
@@ -125,9 +113,22 @@ for num, f in enumerate(french):
         return (best, bests, changed)
 
 
+    def best_perm(current):
+        best=current
+        bests=score(current)
+        perms=list(itertools.permutations(current, len(current)))
+        for perm in perms:
+            sc= score(list(perm))
+            if sc>bests:
+                bests = sc
+                best = perm
+        return best
+
     def improve(h):
         current = extract_english_phrases(winner, [], True)[::-1]
         # currentF = extract_english_phrases(winner, [], False)[::-1]
+        if len(current)<100:
+            return best_perm(current)
         while True:
             s_current = score(current)
             (current, s_current, c1) = swap(current, s_current)
