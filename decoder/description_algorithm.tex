@@ -32,9 +32,53 @@
 \begin{algorithm}[H]
 	\KwData{French sentences}
 	\KwResult{English translation using the model}
-	Initialize hypothesis as binary tuple;
-	Initialize stack, with first entry as hypothesis;
-	
+	\For{f in French}{
+		Initialize hypothesis as binary tuple\;
+		Initialize stacks, with first entry as hypothesis\;
+			\For{i, s in enumerate(stacks)}{
+				\For{h in sort(s.itervalues() by -h.logprob}{
+					\For{j from i+1 to length(f)+1}{
+						\If{f[i:j] in tm}{
+							\For{phrase in tm[f[i:j]]}{
+							s = update\_stacks(j, h, phrase, f[i:j], j == len(f), stacks, -1)
+							}
+						}
+					}
+					\For{j in range i+2 to length(f)}{
+						\If{ (j-5) $<$ 4}{
+							break
+						}
+						newF = list(f[:])\;
+						swap newF[i] and newF[j]\;
+						tnewF = tuple(newF)\;
+						\If{tNewF[i:j] in tm}{
+							\For{phrase in tm[tNewF[i:j]]}{
+								stacks = update\_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks, i-j)
+							}
+						}
+					}
+					\For{j in range i+3 to length(f)}{
+						\If{(j-5) $>$ 4}{
+							break
+						}
+						newF = list(f[:])\;
+						swap newF[i], newF[j]\;
+						perms = permutation(newF[i:i+3])\;
+						\For{perm in enumerate(perms)}{
+							tNewF = tuple(list(perm) + newF[i+3:length(newF])\;
+							\If{tNewF[i:j] in tm}{
+								\For{phrase in tm[tNewF[i:j]]}{
+								stacks = update\_stacks(j, h, phrase, tNewF[i:j], j == len(f), stacks, i-j)
+								}
+							}
+						}
+					
+					}
+				}
+			}
+			winner = max(stacks[-1].itervalues(), f(h) = h.logprob)\;
+			w = improve(winner)\;
+	}
 	
 \end{algorithm}
 \end{document}
