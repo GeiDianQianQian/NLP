@@ -9,5 +9,7 @@ The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 
 ### Turash Mosharraf - tmosharr
 - Improved the baseline model
 - Implemented algorithms from given references
+- Research on how to improve the execution speed
 - Tried various approaches to improve the model
 - Bug fixes
+- Created log files for debugging purpose

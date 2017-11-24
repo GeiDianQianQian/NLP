@@ -1,0 +1,12 @@
+## Decoding - Homework 4 - CMPT 825 & CMPT 413
+> This README file constains information about the taks performed by `sjjung` on Homework 4.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
+
+
+### Seung Jin Jung - sjjung
+- Pair programmed with jylew, trying to implement the baseline
+- Attemped to improve the model implemented by lperesde and tmosharr with given reference
+- Writing documentation for the project
