@@ -194,7 +194,6 @@ def get_next_hypothesis(h, p, lm, len_f):
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
     logprob += lm.end(lm_state) if end >= len_f - 1 else 0.0
-    logprob += opts.y * abs(h.end + 1 - start)
     bits = h.bitmap[:]
     for i in range(start, end + 1):
         bits[i] = True
@@ -218,6 +217,7 @@ def get_next_hypothesis(h, p, lm, len_f):
     # print borders
     for (srt, span) in borders:
         future_score += future_score_matrix[srt][span]
+    future_score += opts.y * abs(h.end + 1 - start)
     new_hypothesis = hypothesis(lm_state, bits, r, logprob, h, p, logprob + future_score)
     return new_hypothesis
 

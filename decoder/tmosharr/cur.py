@@ -4,14 +4,13 @@ import sys
 import models
 from collections import namedtuple
 from collections import defaultdict
-from bitarray import bitarray
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/input",
+optparser.add_option("-i", "--input", dest="input", default="../data/input",
                      help="File containing sentences to translate (default=data/input)")
-optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm",
+optparser.add_option("-t", "--translation-model", dest="tm", default="../data/tm",
                      help="File containing translation model (default=data/tm)")
-optparser.add_option("-l", "--language-model", dest="lm", default="data/lm",
+optparser.add_option("-l", "--language-model", dest="lm", default="../data/lm",
                      help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
@@ -195,7 +194,6 @@ def get_next_hypothesis(h, p, lm, len_f):
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
     logprob += lm.end(lm_state) if end >= len_f - 1 else 0.0
-    logprob += opts.y * abs(h.end + 1 - start)
     bits = h.bitmap[:]
     for i in range(start, end + 1):
         bits[i] = True
@@ -219,6 +217,7 @@ def get_next_hypothesis(h, p, lm, len_f):
     # print borders
     for (srt, span) in borders:
         future_score += future_score_matrix[srt][span]
+    future_score += opts.y * abs(h.end + 1 - start)
     new_hypothesis = hypothesis(lm_state, bits, r, logprob, h, p, logprob + future_score)
     return new_hypothesis
 
@@ -285,9 +284,8 @@ for num, f in enumerate(french):
         for g, h in enumerate(bm):
             # print(i)
             ps = ph(h, all_p_phrases)
-
+	    sys.stderr.write(str(num)+ " " +str(i)+ " " + str(len(stacks[:-1])) + " " +str(g)+ " " +str(len(bm))+ "\n")
             for m, next_p_phrase in enumerate(ps):
-                #print((i, len(stacks[:-1]), g, len(bm), m, len(ps)))
                 next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
                 # print((i, next_p_phrase.start, next_p_phrase.end, j))

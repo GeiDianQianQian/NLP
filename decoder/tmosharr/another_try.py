@@ -127,7 +127,7 @@ for num, f in enumerate(french):
     def improve(h):
         current = extract_english_phrases(winner, [], True)[::-1]
         # currentF = extract_english_phrases(winner, [], False)[::-1]
-        if len(current)<100:
+        if len(current)<4:
             return best_perm(current)
         while True:
             s_current = score(current)
