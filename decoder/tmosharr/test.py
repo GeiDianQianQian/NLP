@@ -20,7 +20,7 @@ def get_list_of_phrases(phrase):
             new_phrase=models.phrase(new_english,logprob)
             phrases.append(new_phrase)
         return phrases
-
+'''
 phrase_1=models.phrase('i will be there', 0.03)
 phrases=get_list_of_phrases(phrase_1)
 #for phrase in phrases:
@@ -44,3 +44,5 @@ for i, bit in enumerate(bits):
 if on==False:
     borders.append((strt,len(bits)-1-strt))
 print borders
+'''
+
