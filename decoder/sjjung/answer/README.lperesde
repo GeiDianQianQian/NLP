@@ -1,0 +1,14 @@
+## Decoding - Homework 4 - CMPT 825 & CMPT 413
+> This README file constains information about the taks performed by `lperesde` on Homework 4.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
+
+
+### Luiz Fernando Peres de Oliveira - lperesde
+- Setup of GitLab project by commiting initial files
+- Succesfully implemented baseline model
+- Initial submission with a score of -1346, surpassing the baseline model score
+- Testing results against given references.
+- Bug fixes

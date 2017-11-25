@@ -3,7 +3,20 @@
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
 ### Instructions on how to run:
-The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
+To get an output, run the decode.py located in the ./decoder folder.
+
+------------------------------------------------------
+$ python decoder.py > output
+------------------------------------------------------
+
+The oupput file will be created within the ./decoder folder, containing the decoded result of the input.
+To test the output file, simply use the output as an input to score-decoder.py
+
+------------------------------------------------------
+$ python score-decoder.py < output
+------------------------------------------------------
+
+
 
 
 ### Turash Mosharraf - tmosharr

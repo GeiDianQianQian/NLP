@@ -1,0 +1,16 @@
+## Decoding - Homework 4 - CMPT 825 & CMPT 413
+> This README file constains information about the taks performed by `tmosharr` on Homework 4.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+The algorithm is described on _page 36_ of __Sarkar 2011__ and is taking around 4 hours to run. For this reason, we suggest you using our `model` file direclty. Please follow the instructions below and unzip it inside this directory.
+
+
+### Turash Mosharraf - tmosharr
+- Improved the baseline model
+- Implemented algorithms from given references
+- Research on how to improve the execution speed
+- Tried various approaches to improve the model
+- Bug fixes
+- Created log files for debugging purpose
+- Prepared files for submission
