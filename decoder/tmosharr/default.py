@@ -6,7 +6,7 @@ from collections import namedtuple
 from collections import defaultdict
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/input",
+optparser.add_option("-i", "--input", dest="input", default="data/one_line",
                      help="File containing sentences to translate (default=data/input)")
 optparser.add_option("-t", "--translation-model", dest="tm", default="data/tm",
                      help="File containing translation model (default=data/tm)")
@@ -14,11 +14,11 @@ optparser.add_option("-l", "--language-model", dest="lm", default="data/lm",
                      help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
-optparser.add_option("-k", "--translations-per-phrase", dest="k", default=20, type="int",
+optparser.add_option("-k", "--translations-per-phrase", dest="k", default=5, type="int",
                      help="Limit on number of translations to consider per phrase (default=20)")
-optparser.add_option("-s", "--stack-size", dest="s", default=1000, type="int", help="Maximum stack size (default=100)")
-optparser.add_option("-d", "--distortion-limit", dest="d", default=100, type="int", help="Distortion limit (default=8)")
-optparser.add_option("-y", "--distortion-penalty", dest="y", default=2, type="float",
+optparser.add_option("-s", "--stack-size", dest="s", default=5, type="int", help="Maximum stack size (default=100)")
+optparser.add_option("-d", "--distortion-limit", dest="d", default=3, type="int", help="Distortion limit (default=8)")
+optparser.add_option("-y", "--distortion-penalty", dest="y", default=0, type="float",
                      help="Distortion penalty (default=0)")
 optparser.add_option("-w", "--beam-width", dest="beam_width", default=0.5, type="float",
                      help="Beam width (default=0.5)")
@@ -108,6 +108,9 @@ sys.stderr.write("Decoding %s...\n" % (opts.input,))
 for num, f in enumerate(french):
     sys.stderr.write("\nDecoding: %s\n" % (num,))
     all_p_phrases = get_all_phrases(f, tm)
+    for lst in all_p_phrases.values():
+        for pht in lst:
+            print pht
     initial_bitmap=[False] * len(f)
     initial_hypothesis = hypothesis(lm.begin(), initial_bitmap, -1, 0.0, None, None)
     stacks = [{} for _ in f] + [{}]
@@ -120,5 +123,9 @@ for num, f in enumerate(french):
                 next_hypothesis=get_next_hypothesis(h, phrase, lm, len(f))
                 j = get_hypothesis_length(next_hypothesis)
                 stacks[j] = add_to_stack(stacks[j], next_hypothesis)
+
+    #for val in stacks[5].values():
+        #print(val)
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
+    #print(winner)
     print extract_english(winner)
