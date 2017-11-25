@@ -25,3 +25,25 @@ $ python score-decoder.py < output
 - Initial submission with a score of -1346, surpassing the baseline model score
 - Testing results against given references.
 - Bug fixes
+
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Thu Nov 23 00:05:00 2017 -0800 | Luiz Fernando Peres | -1308 with 5 unaligned sentences | 7702266
+| Wed Nov 22 23:50:42 2017 -0800 | Luiz Fernando Peres | Getting a -1273 (with bug) | 49724e0
+| Wed Nov 22 22:54:41 2017 -0800 | Luiz Fernando Peres | Modifying improve.py (making it equal to turash) | e25d1f3
+| Wed Nov 22 21:47:41 2017 -0800 | Luiz Fernando Peres | Adding turash files | 7e657f8
+| Wed Nov 22 21:46:46 2017 -0800 | Luiz Fernando Peres | Adding two new files in order to improve | 6a31b14
+| Mon Nov 20 21:54:23 2017 -0800 | Luiz Fernando Peres | Improving models | 51815d9
+| Sun Nov 19 23:18:18 2017 -0800 | Luiz Fernando Peres | Submitting file for -1332 | 4feda29
+| Sun Nov 19 23:15:59 2017 -0800 | Luiz Fernando Peres | Improving code to -1332 | e86e701
+| Sun Nov 19 21:58:28 2017 -0800 | Luiz Fernando Peres | uploading model | 13354fc
+| Sun Nov 19 21:55:17 2017 -0800 | Luiz Fernando Peres | Getting a -1346 | a123ce1
+| Sun Nov 19 21:09:47 2017 -0800 | Luiz Fernando Peres | updating another try file | a36ef70
+| Sun Nov 19 21:09:03 2017 -0800 | Luiz Fernando Peres | Implemented baseline | 19c7633
+| Sun Nov 19 20:42:56 2017 -0800 | Luiz Fernando Peres | It is very bad :/ | a84708b
+| Sun Nov 19 18:25:40 2017 -0800 | Luiz Fernando Peres | Implementing fegreedy | 22c0f0e
+| Sun Nov 19 01:08:01 2017 -0800 | Luiz Fernando Peres | Adding files for the baseline and deleting example | 9bb4dde
+| Sun Nov 19 00:42:18 2017 -0800 | Luiz Fernando Peres | It is currently worse that it was | f1acbef
+| Sat Nov 18 23:41:10 2017 -0800 | Luiz Fernando Peres | Some not good code (must be improved) | 4598c47
+| Sat Nov 18 20:48:15 2017 -0800 | Luiz Fernando Peres | Initial files for baseline | 483b90c

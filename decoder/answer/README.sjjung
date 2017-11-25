@@ -24,3 +24,11 @@ $ python score-decoder.py < output
 - Attemped to improve the model implemented by lperesde and tmosharr with given reference
 - Writing documentation for the project
 - Prepared files for submission
+
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Fri Nov 24 16:00:18 2017 -0800 | sjjung | testing ./decoder/decode.py | cf0f703
+| Fri Nov 24 15:44:10 2017 -0800 | sjjung | preparing for submission | 00632fa
+| Fri Nov 24 15:23:45 2017 -0800 | sjjung | README files updated | 5da5fcc
+| Fri Nov 24 15:10:03 2017 -0800 | sjjung | adding README files | cea5a2e

@@ -27,3 +27,25 @@ $ python score-decoder.py < output
 - Bug fixes
 - Created log files for debugging purpose
 - Prepared files for submission
+
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Fri Nov 24 13:01:59 2017 -0800 | tmosharr | saved backup | 01f286d
+| Fri Nov 24 03:51:09 2017 -0900 | tmosharr | improved another_try.py | b8f58f5
+| Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a littl| Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a littl
+e | 839f82e
+| Thu Nov 23 13:34:24 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | 32bd998
+| Thu Nov 23 13:33:20 2017 -0900 | tmosharr | segmenting inputs | 16ebab3
+| Thu Nov 23 02:25:15 2017 -0900 | tmosharr | added log files for debugging | ddc9ade
+| Thu Nov 23 02:19:17 2017 -0900 | tmosharr | fised some bugs 3 | fe56155
+| Wed Nov 22 17:21:43 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | d1ef2bd
+| Wed Nov 22 17:20:51 2017 -0900 | tmosharr | fised some bugs 2 | 1aac6ed
+| Wed Nov 22 12:11:23 2017 -0900 | tmosharr | fised some bugs | 3b93b10
+| Wed Nov 22 09:08:49 2017 -0900 | tmosharr | parameterized the algorithm from reference, score is not good | 2b3a85f
+| Wed Nov 22 05:28:57 2017 -0900 | tmosharr | implemented the algorithm from reference, score is not good | dbfeb99
+| Tue Nov 21 16:25:47 2017 -0900 | tmosharr | trying to implement algorithm from given reference | 556ebef
+| Tue Nov 21 01:31:20 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | 587d679
+| Tue Nov 21 01:30:13 2017 -0900 | tmosharr | trying to consider different permutations before storing to stack | abcd642
+| Mon Nov 20 09:53:29 2017 -0900 | tmosharr | starting working on improving baseline | 596f0fd
+

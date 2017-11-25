@@ -24,3 +24,10 @@ $ python score-decoder.py < output
 - Attemped to improve the model implemented by lperesde and tmosharr with given reference
 - Writing documentation for the project
 - Documented the implemented pesudocode using LaTeX
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Thu Nov 23 22:19:47 2017 -0800 | jylew | pdflatex | 4406fa8
+| Thu Nov 23 22:09:40 2017 -0800 | jylew | finished pseudocode | c59ecb5
+| Thu Nov 23 21:11:10 2017 -0800 | jylew | documentation | ea2c21f
+| Thu Nov 23 15:39:51 2017 -0800 | jylew | First attempt | 23e48a4
