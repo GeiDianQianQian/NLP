@@ -14,9 +14,9 @@ optparser.add_option("-l", "--language-model", dest="lm", default="../data/lm",
                      help="File containing ARPA-format language model (default=data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
-optparser.add_option("-k", "--translations-per-phrase", dest="k", default=1, type="int",
+optparser.add_option("-k", "--translations-per-phrase", dest="k", default=1000, type="int",
                      help="Limit on number of translations to consider per phrase (default=1)")
-optparser.add_option("-s", "--stack-size", dest="s", default=1, type="int", help="Maximum stack size (default=1)")
+optparser.add_option("-s", "--stack-size", dest="s", default=1000, type="int", help="Maximum stack size (default=1)")
 optparser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
                      help="Verbose mode (default=off)")
 opts = optparser.parse_args()[0]
@@ -89,15 +89,14 @@ for num, f in enumerate(french):
         bests = s
         changed = False
         perms=[]
-        for i in range(len(arr[:-5])):
-            for j in xrange(i + 1, len(arr[:-4])):
-                for k in xrange(j + 1, len(arr[:-3])):
-                    for l in xrange(k + 1, len(arr[:-2])):
-                        ind_array=[i, j, k, l]
+        for i in range(len(arr[:-3])):
+            for j in xrange(i + 1, len(arr[:-2])):
+                for k in xrange(j + 1, len(arr[:-1])):
+                        ind_array=[i, j, k]
                         permutations = list(itertools.permutations(ind_array, len(ind_array)))
                         for n in permutations:
                             aux = arr[:]
-                            aux[i], aux[j], aux[k], aux[l] = aux[n[0]], aux[n[1]], aux[n[2]], aux[n[3]]
+                            aux[i], aux[j], aux[k] = aux[n[0]], aux[n[1]], aux[n[2]]
                             perms.append(aux)
 
         best = arr[:]
@@ -127,8 +126,7 @@ for num, f in enumerate(french):
     def improve(h):
         current = extract_english_phrases(winner, [], True)[::-1]
         # currentF = extract_english_phrases(winner, [], False)[::-1]
-        if len(current)<4:
-            return best_perm(current)
+
         while True:
             s_current = score(current)
             (current, s_current, c1) = swap(current, s_current)
