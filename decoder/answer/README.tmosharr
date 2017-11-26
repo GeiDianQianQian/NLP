@@ -3,7 +3,7 @@
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
 ### Instructions on how to run:
-To get an output, run the decode.py located in the ./decoder folder.
+To get an output, run the decode.py located in the ./decoder folder. It takes approximately 47 min on a Macbook Pro (i7).
 
 ------------------------------------------------------
 $ python decoder.py > output
@@ -31,10 +31,16 @@ $ python score-decoder.py < output
 
 ### Log
 | Date | Author | Message | Abbreviated Hash |
+| 2017-11-25 21:08:17 2017 -0900 | tmosharr | Finished Coding, Wrapping up | 6b20c4b |
+| 2017-11-25 00:12:36 2017 -0800 | tmosharr | dealing with stack underflow | 94b4589 |
+| 2017-11-24 17:31:24 2017 -0800 | tmosharr | finalizing...                | 1e783b8 |
+| 2017-11-24 16:20:20 2017 -0800 | tmosharr | finalizing                   | 7767aa0 |
+| 2017-11-24 12:50:09 2017 -0800 | tmosharr | submission of files 2        | d91debb |
+| 2017-11-24 10:08:37 2017 -0800 | tmosharr | Merge branch 'master'        | 2edffbc |
 | Fri Nov 24 13:01:59 2017 -0800 | tmosharr | saved backup | 01f286d
 | Fri Nov 24 03:51:09 2017 -0900 | tmosharr | improved another_try.py | b8f58f5
-| Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a littl| Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a littl
-e | 839f82e
+| Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a littl|
+Fri Nov 24 00:49:07 2017 -0900 | tmosharr | leaderboard score improved a little | 839f82e
 | Thu Nov 23 13:34:24 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | 32bd998
 | Thu Nov 23 13:33:20 2017 -0900 | tmosharr | segmenting inputs | 16ebab3
 | Thu Nov 23 02:25:15 2017 -0900 | tmosharr | added log files for debugging | ddc9ade

@@ -3,7 +3,7 @@
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
 ### Instructions on how to run:
-To get an output, run the decode.py located in the ./decoder folder.
+To get an output, run the decode.py located in the ./decoder folder. It takes approximately 47 min on a Macbook Pro (i7).
 
 ------------------------------------------------------
 $ python decoder.py > output
