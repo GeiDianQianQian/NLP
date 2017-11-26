@@ -4,26 +4,26 @@ import sys
 import models
 from collections import namedtuple
 from collections import defaultdict
+import itertools
 
 optparser = optparse.OptionParser()
 optparser.add_option("-i", "--input", dest="input", default="../data/input",
-                     help="File containing sentences to translate (default=data/input)")
+                     help="File containing sentences to translate (default=../data/input)")
 optparser.add_option("-t", "--translation-model", dest="tm", default="../data/tm",
-                     help="File containing translation model (default=data/tm)")
+                     help="File containing translation model (default=../data/tm)")
 optparser.add_option("-l", "--language-model", dest="lm", default="../data/lm",
-                     help="File containing ARPA-format language model (default=data/lm)")
+                     help="File containing ARPA-format language model (default=../data/lm)")
 optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint, type="int",
                      help="Number of sentences to decode (default=no limit)")
 optparser.add_option("-k", "--translations-per-phrase", dest="k", default=20, type="int",
-                     help="Limit on number of translations to consider per phrase (default=1)")
-optparser.add_option("-s", "--stack-size", dest="s", default=1000, type="int", help="Maximum stack size (default=1)")
-optparser.add_option("-d", "--distortion-limit", dest="d", default=8, type="int", help="Distortion limit (default=5)")
-optparser.add_option("-y", "--distortion-penalty", dest="y", default=-1, type="float",
-                     help="Distortion penalty (default=-1)")
-optparser.add_option("-w", "--beam-width", dest="beam_width", default=54.9, type="float",
-                     help="Beam width (default=1)")
-optparser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False,
-                     help="Verbose mode (default=off)")
+                     help="Limit on number of translations to consider per phrase (default=20)")
+optparser.add_option("-s", "--stack-size", dest="s", default=1000, type="int", help="Maximum stack size (default=3000)")
+optparser.add_option("-d", "--distortion-limit", dest="d", default=8, type="int", help="Distortion limit (default=8)")
+optparser.add_option("-y", "--distortion-penalty", dest="y", default=1, type="float",
+                     help="Distortion penalty (default=0)")
+optparser.add_option("-w", "--beam-width", dest="beam_width", default=0.5, type="float",
+                     help="Beam width (default=0.5)")
+
 opts = optparser.parse_args()[0]
 
 tm = models.TM(opts.tm, opts.k)
@@ -32,6 +32,8 @@ p_phrase = namedtuple("p_phrase", "start, end, english, logprob")
 hypothesis = namedtuple("hypothesis", "lm_state, bitmap, end, logprob, predecessor, last_phrase")
 french = [tuple(line.strip().split()) for line in open(opts.input).readlines()[:opts.num_sents]]
 
+def extract_english_without_permutation(h):
+    return "" if h.predecessor is None else "%s%s " % (extract_english_without_permutation(h.predecessor), h.last_phrase.english)
 
 def extract_english_phrases(h, phrase_list, length):
     while (True):
@@ -62,15 +64,25 @@ def swap(arr, s):
     best = arr[:]
     bests = s
     changed = False
-    for i in range(len(arr[:-2])):
-        for j in xrange(i + 1, len(arr[:-1])):
-            aux = arr[:]
-            aux[i], aux[j] = aux[j], aux[i]
-            sc = sequence_score(aux)
-            if (sc > bests):
-                bests = sc
-                best = aux[:]
-                changed = True
+    perms=[]
+    for i in range(len(arr[:-3])):
+        for j in xrange(i + 1, len(arr[:-2])):
+            for k in xrange(j + 1, len(arr[:-1])):
+                ind_array=[i, j, k]
+                permutations = list(itertools.permutations(ind_array, len(ind_array)))
+                for n in permutations:
+                    aux = arr[:]
+                    aux[i], aux[j], aux[k] = aux[n[0]], aux[n[1]], aux[n[2]]
+                    perms.append(aux)
+    best = arr[:]
+    bests = s
+    changed = False
+    for it in perms:
+        sc=sequence_score(it)
+        if sc>bests:
+            bests = sc
+            best = it
+            changed = True
     return (best, bests, changed)
 
 
@@ -110,77 +122,69 @@ def get_all_phrases(f, tm):
     return all_p_phrases
 
 
+def collides(bitmap, i, j):
+    for k in range(i, j + 1):
+        if bitmap[k]:
+            return True
+    return False
+
+
 def ph(h, all_p_phrases):
     s = []
-    keys = all_p_phrases.keys()
-    for key in keys:
-        p_phrase_list = all_p_phrases[key]
+    for p_phrase_list in all_p_phrases.values():
         for p_phrase in p_phrase_list:
-            start = p_phrase.start
-            end = p_phrase.end
-            phrase_bit = 2**start-2**end
-            if (abs(h.end + 1 - start) > opts.d) and (h.bitmap & phrase_bit):
+            if abs(h.end + 1 - p_phrase.start) > opts.d or collides(h.bitmap, p_phrase.start, p_phrase.end):
                 break
+            s.append(p_phrase)
     return s
 
 
 def get_next_hypothesis(h, p, lm, len_f):
-    english = p.english
     logprob = h.logprob + p.logprob
-    start = p.start
-    end = p.end
     lm_state = h.lm_state
-    for english_word in english.split():
+    for english_word in p.english.split():
         (lm_state, english_word_logprob) = lm.score(lm_state, english_word)
         logprob += english_word_logprob
-    logprob += lm.end(lm_state) if end >= len_f - 1 else 0.0
-    bits = h.bitmap
-    phrase_bits=2**start-2**end
-    bits=bits|phrase_bits
-    r = end
-    new_hypothesis = hypothesis(lm_state, bits, r, logprob, h, p)
+    logprob += lm.end(lm_state) if p.end >= len_f - 1 else 0.0
+    logprob -= abs(h.end + 1 - p.start)*opts.y
+    bits = h.bitmap[:]
+    for i in range(p.start, p.end + 1): bits[i] = True
+    new_hypothesis = hypothesis(lm_state, bits, p.end, logprob, h, p)
     return new_hypothesis
 
 
 def add_to_stack(stack, h1):
-    keys = stack.keys()
-    for key in keys:
-        h2 = stack[key]
-        if h2.logprob <h1.logprob:
-            stack[state] = h1
+    if (h1.lm_state, tuple(h1.bitmap), h1.end) not in stack or stack[(h1.lm_state, tuple(h1.bitmap), h1.end)].logprob < h1.logprob:
+        stack[(h1.lm_state, tuple(h1.bitmap), h1.end)] = h1
     return stack
 
 
-# tm should translate unknown words as-is with probability 1
 for word in set(sum(french, ())):
     if (word,) not in tm:
         tm[(word,)] = [models.phrase(word, 0.0)]
 
+
 sys.stderr.write("Decoding %s...\n" % (opts.input,))
 for num, f in enumerate(french):
+    s=opts.s
+    if(num==34 or num==36):
+        s*=3
     sys.stderr.write("\nDecoding: %s\n" % (num,))
     all_p_phrases = get_all_phrases(f, tm)
-    initial_hypothesis = hypothesis(lm.begin(), 0, -1, 0.0, None, None)
+    initial_bitmap=[False] * len(f)
+    initial_hypothesis = hypothesis(lm.begin(), initial_bitmap, -1, 0.0, None, None)
     stacks = [{} for _ in f] + [{}]
-    stacks[0][(lm.begin(),0,-1)] = initial_hypothesis
-
+    stacks[0][(lm.begin(), tuple(initial_bitmap), -1)] = initial_hypothesis
     for i, stack in enumerate(stacks[:-1]):
-        sys.stderr.write(".")
-        bm =sorted(stack.itervalues(), key=lambda h: -(h.logprob))[:opts.s]
-        for g, h in enumerate(bm):
+        sys.stderr.write('.')
+        for j, h in enumerate(sorted(stack.itervalues(), key=lambda h: -h.logprob)[:s]):
             ps = ph(h, all_p_phrases)
-	        #sys.stderr.write(str(num)+ " " +str(i)+ " " + str(len(stacks[:-1])) + " " +str(g)+ " " +str(len(bm))+ "\n")
-            for m, next_p_phrase in enumerate(ps):
-                next_hypothesis = get_next_hypothesis(h, next_p_phrase, lm, len(f))
-                stacks[population_count(next_hypothesis.bitmap)] = add_to_stack(stacks[j], next_hypothesis)
-
+            for phrase in ps:
+                next_hypothesis=get_next_hypothesis(h, phrase, lm, len(f))
+                j = get_hypothesis_length(next_hypothesis)
+                stacks[j] = add_to_stack(stacks[j], next_hypothesis)
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
-
-    e_phrases = extract_english_phrases(winner, [], len(f))
-    print " ".join(improve(e_phrases))
-    # print " ".join(e_phrases)
-
-    if opts.verbose:
-        tm_logprob = extract_tm_logprob(winner)
-        sys.stderr.write("LM = %f, TM = %f, Total = %f\n" %
-                         (winner.logprob - tm_logprob, tm_logprob, winner.logprob))
+    #e_phrases = extract_english_phrases(winner, [], len(f))
+    #sys.stderr.write('permuting: '+ str(num)+'\n')
+    #print " ".join(improve(e_phrases))
+    print(extract_english_without_permutation(winner))

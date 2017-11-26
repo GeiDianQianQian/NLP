@@ -7,7 +7,7 @@ from collections import namedtuple
 # and values are lists of (english, logprob) named tuples. For instance,
 # the French phrase "que se est" has two translations, represented like so:
 # tm[('que', 'se', 'est')] = [
-#   phrase(english='what has', logprob=-0.301030009985), 
+#   phrase(english='what has', logprob=-0.301030009985),
 #   phrase(english='what has been', logprob=-0.301030009985)]
 # k is a pruning parameter: only the top k translations are kept for each f.
 phrase = namedtuple("phrase", "english, logprob")
@@ -53,9 +53,9 @@ class LM:
       if ngram in self.table:
         return (ngram[-2:], score + self.table[ngram].logprob)
       else: #backoff
-        score += self.table[ngram[:-1]].backoff if len(ngram) > 1 else 0.0 
+        score += self.table[ngram[:-1]].backoff if len(ngram) > 1 else 0.0
         ngram = ngram[1:]
     return ((), score + self.table[("<unk>",)].logprob)
-    
+
   def end(self, state):
     return self.score(state, "</s>")[1]
