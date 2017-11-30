@@ -3,13 +3,13 @@
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
 ### Instructions on how to run:
-To get an output, run the decode.py located in the ./decoder folder. It takes approximately 47 min on a Macbook Pro (i7).
+To get an output, run the decode.py located in the answer folder. It takes approximately 47 min on a Macbook Pro (i7).
 
 ------------------------------------------------------
-$ python decoder.py > output
+$ python decode.py > output
 ------------------------------------------------------
 
-The oupput file will be created within the ./decoder folder, containing the decoded result of the input.
+The oupput file will be created within the answer folder, containing the decoded result of the input.
 To test the output file, simply use the output as an input to score-decoder.py
 
 ------------------------------------------------------
