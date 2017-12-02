@@ -3,8 +3,8 @@ import optparse
 import sys
 
 optparser = optparse.OptionParser()
-optparser.add_option("-i", "--input", dest="input", default="data/hyp1-hyp2-ref", help="Input file (default data/train.hyp1-hyp2-ref)")
-optparser.add_option("-t", "--truth", dest="truth", default="data/dev.answers", help="Human judgements (default=data/train.answers)")
+optparser.add_option("-i", "--input", dest="input", default="../data/hyp1-hyp2-ref", help="Input file (default data/train.hyp1-hyp2-ref)")
+optparser.add_option("-t", "--truth", dest="truth", default="../data/dev.answers", help="Human judgements (default=data/train.answers)")
 (opts, args) = optparser.parse_args()
 
 (right, wrong) = (0.0,0.0)
