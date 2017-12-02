@@ -19,3 +19,9 @@
  - [README.tmosharr](./decoder/answer/README.tmosharr)
  - [README.sjjung](./aligner/answer/README.sjjung)
  - [README.jylew](./aligner/answer/README.jylew)
+
+### Final Project - Evaluator
+ - [README.lperesde](./evaluator/answer/README.lperesde)
+ - [README.tmosharr](./evaluator/answer/README.tmosharr)
+ - [README.sjjung](./evaluator/answer/README.sjjung)
+ - [README.jylew](./evaluator/answer/README.jylew)
