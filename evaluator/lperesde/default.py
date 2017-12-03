@@ -2,8 +2,7 @@
 import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
-from collections import Counter
-import nltk
+from nltk.corpus import stopwords
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
 parser.add_argument('-i', '--input', default='../data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
@@ -25,7 +24,7 @@ def matches(h, e):
 def sentences():
     with open(opts.input) as f:
         for pair in f:
-            yield [sentence.strip().split() for sentence in pair.split(' ||| ')]
+            yield [sentence.lower().strip().split() for sentence in pair.split(' ||| ')]
 
 def get_ngrams(sentence, ref1, ref2, vc1, vc2):
     for n in xrange(1,5):
@@ -43,28 +42,33 @@ def get_ngrams(sentence, ref1, ref2, vc1, vc2):
 
     return (vc1, vc2)
 
-def get_words(sentence, ref1, ref2, vc1, vc2):
-    # no-op
-    return (vc1, vc2)
-
 def get_pos(sentence, ref1, ref2, vc1, vc2):
     # no-op
     return (vc1, vc2)
 
+def fix_input(h):
+    h = [w.replace("&quot;", '"') for w in h]
+    return h
+
+# remove stop words
+def rsw(h):
+    return [word for word in h if word not in cachedStopWords]
+
+cachedStopWords = stopwords.words("english")
 for h1, h2, e in islice(sentences(), opts.num_sentences):
-    vc1 = [0] * 32 # feature vector h1
-    vc2 = [0] * 32 # feature vector h2
-    (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2)
-    (vc1, vc2) = get_words(e, h1, h2, vc1, vc2)
-    (vc1, vc2) = get_pos(e, h1, h2, vc1, vc2)
-    l1 = sum(vc1)
-    l2 = sum(vc2)
-    if l1 > l2:
-        print 1
-    elif l1 == l2:
+    vc1, vc2  = [0] * 32, [0] * 32 # feature vector h1
+    sw1, sw2 = [0] * 13, [0] * 13
+    h1 = fix_input(h1)
+    h2 = fix_input(h2)
+    (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2) 
+    (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2)
+    l1 = (sum(vc1) + (sum(sw1) * 1.1))/2.1
+    l2 = (sum(vc2) + (sum(sw2) * 1.1))/2.1
+    if l1 == l2:
         print 0
+    elif l1 > l2:
+        print 1
     else:
         print -1
-
 
 
