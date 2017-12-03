@@ -3,6 +3,7 @@ import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
 from nltk.corpus import stopwords
+import string
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
 parser.add_argument('-i', '--input', default='../data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
@@ -24,7 +25,7 @@ def matches(h, e):
 def sentences():
     with open(opts.input) as f:
         for pair in f:
-            yield [sentence.lower().strip().split() for sentence in pair.split(' ||| ')]
+            yield [sentence.translate(None, string.punctuation).lower().strip().split() for sentence in pair.split(' ||| ')]
 
 def get_ngrams(sentence, ref1, ref2, vc1, vc2):
     for n in xrange(1,5):
