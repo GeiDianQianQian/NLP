@@ -3,6 +3,8 @@ import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
 from nltk.corpus import stopwords
+from nltk.stem import wordnet as wn
+from nltk import pos_tag
 import string
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -15,6 +17,7 @@ parser.add_argument('-g', '--gamma', default=0.5, type=float, help='Number of hy
 opts = parser.parse_args()
 
 cachedStopWords = stopwords.words("english")
+wnlemma = wn.WordNetLemmatizer()
 ngram_dict = {}
 
 def matches(h, e):
@@ -26,10 +29,35 @@ def matches(h, e):
     f = 2 * p * r / (p + r)
     return p, r, f
 
+def get_type_wordnet(tag):
+    ADJ, ADV, NOUN, VERB = 'a', 'r', 'n', 'v'
+    if tag.startswith('N'):
+        return NOUN
+    elif tag.startswith('V'):
+        return VERB
+    elif tag.startswith('J'):
+        return ADJ
+    elif tag.startswith('R'):
+        return ADV
+    
+    return VERB
+
+
 def sentences():
     with open(opts.input) as f:
         for pair in f:
-            yield [sentence.translate(None, string.punctuation).lower().strip().split() for sentence in pair.split(' ||| ')]
+            yield [ 
+                [
+                    wnlemma.lemmatize(''.join(w[:1]), get_type_wordnet(''.join(w[1:])))
+                    for w in 
+                       pos_tag(sentence.translate(None, string.punctuation).
+                       decode('unicode_escape').encode('ascii','ignore').
+                       lower().
+                       strip().
+                       split())
+                ]
+                for sentence in pair.split(' ||| ')
+            ]
 
 def get_model():
     with open(opts.model) as f:
@@ -90,7 +118,7 @@ for h1, h2, e in islice(sentences(), opts.num_sentences):
     (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2, True) 
     (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2, False)
     l1 = (sum(vc1[0:13]) + (sum(sw1) * 1.1) + (vc1[13]*0.4))/2.5
-    l2 = (sum(vc2[0:13]) + (sum(sw2) * 1.1 + (vc1[13]*0.4)))/2.5
+    l2 = (sum(vc2[0:13]) + (sum(sw2) * 1.1) + (vc1[13]*0.4))/2.5
     if l1 == l2:
         print 0
     elif l1 > l2:
