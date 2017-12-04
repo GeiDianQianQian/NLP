@@ -7,11 +7,15 @@ import string
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
 parser.add_argument('-i', '--input', default='../data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
+parser.add_argument('-m', '--model', default='./model/ngram_model', help='input file (model)')
 parser.add_argument('-n', '--num_sentences', default=None, type=int, help='Number of hypothesis pairs to evaluate')
 parser.add_argument('-a', '--alpha', default=0.1, type=float, help='Number of hypothesis pairs to evaluate')
 parser.add_argument('-b', '--beta', default=3.0, type=float, help='Number of hypothesis pairs to evaluate')
 parser.add_argument('-g', '--gamma', default=0.5, type=float, help='Number of hypothesis pairs to evaluate')
 opts = parser.parse_args()
+
+cachedStopWords = stopwords.words("english")
+ngram_dict = {}
 
 def matches(h, e):
     r = 0.0
@@ -27,11 +31,30 @@ def sentences():
         for pair in f:
             yield [sentence.translate(None, string.punctuation).lower().strip().split() for sentence in pair.split(' ||| ')]
 
-def get_ngrams(sentence, ref1, ref2, vc1, vc2):
+def get_model():
+    with open(opts.model) as f:
+        for pair in f:
+            yield tuple(pair.split(' ||| '))
+
+def score_ngram(ngram):
+    if ngram in ngram_dict:
+        return ngram_dict[ngram]
+    else:
+        return -10
+
+def get_ngrams(sentence, ref1, ref2, vc1, vc2, long):
+    score_ref1 = 0
+    score_ref2 = 0
     for n in xrange(1,5):
         e_ngrams  = [tuple(sentence[i:i+n]) for i in xrange(len(sentence)+1-n)]
         h1_ngrams = [tuple(ref1[i:i+n]) for i in xrange(len(ref1)+1-n)]
         h2_ngrams = [tuple(ref2[i:i+n]) for i in xrange(len(ref2)+1-n)]
+
+        if long:
+            for i in xrange(len(ref1)+1-n):
+                score_ref1 += score_ngram(tuple(ref1[i:i+n]))
+            for i in xrange(len(ref2)+1-n):
+                score_ref2 += score_ngram(tuple(ref2[i:i+n]))
 
         # save precison, score and f1 for ngrams
         (vc1[n-1], vc1[n+3], vc1[n+7]) = matches(h1_ngrams, e_ngrams)
@@ -40,6 +63,10 @@ def get_ngrams(sentence, ref1, ref2, vc1, vc2):
     # average of ngrams
     vc1[12] = (vc1[0]+vc1[1]+vc1[2]+vc1[3])/4
     vc2[12] = (vc2[0]+vc2[1]+vc2[2]+vc2[3])/4
+
+    if long:
+        vc1[13] = score_ref1/100
+        vc2[13] = score_ref2/100
 
     return (vc1, vc2)
 
@@ -55,16 +82,19 @@ def fix_input(h):
 def rsw(h):
     return [word for word in h if word not in cachedStopWords]
 
-cachedStopWords = stopwords.words("english")
+for words, count in get_model():
+    tp = tuple(words.split())
+    ngram_dict[tp] = float(count)
+
 for h1, h2, e in islice(sentences(), opts.num_sentences):
     vc1, vc2  = [0] * 32, [0] * 32 # feature vector h1
     sw1, sw2 = [0] * 13, [0] * 13
     h1 = fix_input(h1)
     h2 = fix_input(h2)
-    (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2) 
-    (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2)
-    l1 = (sum(vc1) + (sum(sw1) * 1.1))/2.1
-    l2 = (sum(vc2) + (sum(sw2) * 1.1))/2.1
+    (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2, True) 
+    (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2, False)
+    l1 = (sum(vc1[0:13]) + (sum(sw1) * 1.1) + (vc1[13]*0.4))/2.5
+    l2 = (sum(vc2[0:13]) + (sum(sw2) * 1.1 + (vc1[13]*0.4)))/2.5
     if l1 == l2:
         print 0
     elif l1 > l2:
