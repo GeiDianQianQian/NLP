@@ -42,19 +42,19 @@ def score_ngram(ngram):
     else:
         return -10
 
-def get_ngrams(sentence, ref1, ref2, vc1, vc2, long):
-    score_ref1 = 0
-    score_ref2 = 0
+def get_ngrams(reference, cand1, cand2, vc1, vc2, long):
+    score_cand1 = 0
+    score_cand2 = 0
     for n in xrange(1,5):
-        e_ngrams  = [tuple(sentence[i:i+n]) for i in xrange(len(sentence)+1-n)]
-        h1_ngrams = [tuple(ref1[i:i+n]) for i in xrange(len(ref1)+1-n)]
-        h2_ngrams = [tuple(ref2[i:i+n]) for i in xrange(len(ref2)+1-n)]
+        e_ngrams  = [tuple(reference[i:i+n]) for i in xrange(len(reference)+1-n)]
+        h1_ngrams = [tuple(cand1[i:i+n]) for i in xrange(len(cand1)+1-n)]
+        h2_ngrams = [tuple(cand2[i:i+n]) for i in xrange(len(cand2)+1-n)]
 
         if long:
-            for i in xrange(len(ref1)+1-n):
-                score_ref1 += score_ngram(tuple(ref1[i:i+n]))
-            for i in xrange(len(ref2)+1-n):
-                score_ref2 += score_ngram(tuple(ref2[i:i+n]))
+            for i in xrange(len(cand1)+1-n):
+                score_cand1 += score_ngram(tuple(cand1[i:i+n]))
+            for i in xrange(len(cand2)+1-n):
+                score_cand2 += score_ngram(tuple(cand2[i:i+n]))
 
         # save precison, score and f1 for ngrams
         (vc1[n-1], vc1[n+3], vc1[n+7]) = matches(h1_ngrams, e_ngrams)
@@ -65,13 +65,9 @@ def get_ngrams(sentence, ref1, ref2, vc1, vc2, long):
     vc2[12] = (vc2[0]+vc2[1]+vc2[2]+vc2[3])/4
 
     if long:
-        vc1[13] = score_ref1/100
-        vc2[13] = score_ref2/100
+        vc1[13] = score_cand1/100
+        vc2[13] = score_cand2/100
 
-    return (vc1, vc2)
-
-def get_pos(sentence, ref1, ref2, vc1, vc2):
-    # no-op
     return (vc1, vc2)
 
 def fix_input(h):
