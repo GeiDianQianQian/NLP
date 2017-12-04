@@ -5,6 +5,7 @@ import numpy as np
 from nltk.corpus import stopwords
 from nltk.stem import wordnet as wn
 from nltk import pos_tag
+from nltk import word_tokenize
 import string
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -46,18 +47,14 @@ def get_type_wordnet(tag):
 def sentences():
     with open(opts.input) as f:
         for pair in f:
-            yield [ 
-                [
-                    wnlemma.lemmatize(''.join(w[:1]), get_type_wordnet(''.join(w[1:])))
-                    for w in 
-                       pos_tag(sentence.translate(None, string.punctuation).
-                       decode('unicode_escape').encode('ascii','ignore').
-                       lower().
-                       strip().
-                       split())
-                ]
-                for sentence in pair.split(' ||| ')
-            ]
+            value = [[],[],[]]
+            for i,sentence in enumerate(pair.split(' ||| ')):
+                sentence = sentence.decode('unicode_escape').encode('ascii','ignore').lower()
+                arr = [wnlemma.lemmatize(''.join(w[:1]), get_type_wordnet(''.join(w[1:])))
+                             for w in pos_tag(word_tokenize(sentence))]
+                # remove punctuation
+                value[i] = str(" ".join(arr)).translate(None, string.punctuation).strip().split()
+            yield value
 
 def get_model():
     with open(opts.model) as f:
