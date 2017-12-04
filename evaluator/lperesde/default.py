@@ -3,9 +3,11 @@ import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
 from nltk.corpus import stopwords
+from nltk.corpus import wordnet as wdn
 from nltk.stem import wordnet as wn
 from nltk import pos_tag
 from nltk import word_tokenize
+from itertools import chain
 import string
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -21,10 +23,25 @@ cachedStopWords = stopwords.words("english")
 wnlemma = wn.WordNetLemmatizer()
 ngram_dict = {}
 
+def wn_contains(word, ref):
+    # compare only unigrams
+    if len(word) > 1:
+        return False
+    synonyms = wdn.synsets(''.join(word))
+    synset   = set(chain.from_iterable([word.lemma_names() for word in synonyms]))
+    refset   = set([''.join(r) for r in ref])
+    result   = bool(synset & refset)
+    return result # check intersection of sets
+
 def matches(h, e):
     r = 0.0
     p = 0.0
-    m = sum(1 for w in h if w in e) + 0.0001
+    m = 0.0001
+    for w in h:
+        # 'wn_contains' is expensive, so it only goes there
+        # in case that we did not find it (a second try)
+        if w in e or wn_contains(w, e):
+            m += 1
     r = float(m)/float(len(e)) if e else 0.0001
     p = float(m)/float(len(h)) if h else 0.0001 
     f = 2 * p * r / (p + r)
@@ -42,7 +59,6 @@ def get_type_wordnet(tag):
         return ADV
     
     return VERB
-
 
 def sentences():
     with open(opts.input) as f:
