@@ -33,21 +33,36 @@ def wn_contains(word, ref):
     result   = bool(synset & refset)
     return result # check intersection of sets
 
-def wn_similar(word, ref):
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+
+def is_similar(word, ref):
     # compare only unigrams
     if len(word) > 1:
         return False
-    synonyms = wdn.synsets(''.join(word))
-    arrRef   = [''.join(r) for r in ref]
-    if synonyms:
-        for r in arrRef:
-            for synonym in synonyms:
-                    allSyn = wdn.synsets(r)
-                    if allSyn:
-                        for s in allSyn:
-                            sim = synonym.wup_similarity(s)
-                            if sim > 0.9:
-                                return True
+    synonyms = [word.lemma_names() for word in wdn.synsets(''.join(word))]
+    words = [''.join(r) for r in ref]
+    for syn in chain.from_iterable(synonyms):
+        for w in words:
+            if levenshtein(str(syn), str(w)) > 0.8:
+                return True
     return False
 
 def matches(h, e):
@@ -57,9 +72,7 @@ def matches(h, e):
     for w in h:
         # 'wn_contains' is expensive, so it only goes there
         # in case that we did not find it (a second try)
-        if w in e or wn_contains(w, e):
-            m += 1
-        elif wn_similar(w, e):
+        if w in e or wn_contains(w, e) or is_similar(w, e):
             m += 1
     r = float(m)/float(len(e)) if e else 0.0001
     p = float(m)/float(len(h)) if h else 0.0001 
@@ -149,8 +162,8 @@ for h1, h2, e in islice(sentences(), opts.num_sentences):
     h2 = fix_input(h2)
     (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2, True) 
     (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2, False)
-    l1 = (sum(vc1[0:13]) + (sum(sw1) * 1.1) + (vc1[13]*0.4))/2.5
-    l2 = (sum(vc2[0:13]) + (sum(sw2) * 1.1) + (vc1[13]*0.4))/2.5
+    l1 = (sum(vc1[0:8])*0.5 + (sum(vc1[8:13]) * 2) + (sum(sw1) * 1.1) + (vc1[13]*0.4))/4
+    l2 = (sum(vc2[0:8])*0.5 + (sum(vc2[8:13]) * 2) + (sum(sw2) * 1.1) + (vc1[13]*0.4))/4
     if l1 == l2:
         print 0
     elif l1 > l2:
