@@ -156,7 +156,7 @@ for words, count in get_model():
     ngram_dict[tp] = float(count)
 
 for h1, h2, e in islice(sentences(), opts.num_sentences):
-    vc1, vc2  = [0] * 32, [0] * 32 # feature vector h1
+    vc1, vc2  = [0] * 14, [0] * 14 # feature vector h1
     sw1, sw2 = [0] * 13, [0] * 13
     h1 = fix_input(h1)
     h2 = fix_input(h2)
