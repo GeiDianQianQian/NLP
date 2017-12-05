@@ -1,0 +1,135 @@
+%
+% File acl2012.tex
+%
+% Contact: Maggie Li (cswjli@comp.polyu.edu.hk), Michael White (mwhite@ling.osu.edu)
+%%
+%% Based on the style files for ACL2008 by Joakim Nivre and Noah Smith
+%% and that of ACL2010 by Jing-Shin Chang and Philipp Koehn
+
+
+\documentclass[11pt,letterpaper]{article}
+\usepackage[letterpaper]{geometry}
+\usepackage{acl2012}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[]{algorithm2e}
+\makeatletter
+\newcommand{\@BIBLABEL}{\@emptybiblabel}
+\newcommand{\@emptybiblabel}[1]{}
+\makeatother
+\usepackage[hidelinks]{hyperref}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\setlength\titlebox{6.5cm}    % Expanding the titlebox
+
+\title{CMPT 413/825 Project\\Using ROSE metric for Machine Translation Evaluation}
+
+\author{Luiz Peres de Oliveira \\
+  {\tt lperesde@sfu.ca} \\\And
+  Turash Mosharraf \\
+  {\tt tmosharr@sfu.ca} \\\And
+  Jin Jung \\
+  {\tt sjjung@sfu.ca} \\\And
+  Justin Lew \\
+  {\tt jylew@sfu.ca}
+  }
+
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+
+\end{abstract}
+
+\section{Motivation}
+
+The motivation of using regression and ranking based optimisation in the machine translation evaluation problem is to improve the accuracy of the evaluation beyond the baseline implementation. The baseline implementation used the METEOR metric for finding precision and recall.
+
+\section{Approach}
+
+The approach taken to improve from the baseline is partially based on the implementation of the ROSE metric (Song and Cohn, 2011.) The algorithm used two feature vectors. The first feature vector consist of the parameters, preceded by it's ID:
+	\begin{itemize}
+		\item 1-4: n-gram precision, n=1...4
+		\item 5-8: n-gram recall, n=1...4
+		\item 9-12: n-gram f-measure, n=1...4
+		\item 13: average n-gram precision for sentence
+		\item 14: score sentence at Document level
+	\end{itemize}
+The second feature vector consist of the parameters, preceded by it's ID:
+	\begin{itemize}
+		\item 1-4: n-gram precision for sentence excluding stopwords, n=1...4
+		\item 5-8: n-gram recall for sentence excluding stopwords, n=1...4
+		\item 9-12 n-gram f-measure for sentence excluding stopwords, n=1...4
+		\item 13 average n-gram precision for sentence excluding stopwords, n=1...4
+	\end{itemize}
+
+One way to compare the two translations is using n-gram precision and n-gram recall. n-gram precision is the ratio of the count of n-grams in the candidate translation sentence that is in the reference sentence to the counts of all n-grams in the candidate sentence. The n-gram precision is defined as 
+	\[P_{n} = \frac{\sum_{ngram \in \vec{c}, ngram \in \vec{r}} Count(ngram)}{\sum_{ngram\in \vec{c}} Count(ngram)  } \]
+
+where $\vec{r}$, is defined as the (human) reference sentence, and $\vec{c}$, is defined as the (hypothesis) candidate sentence. Only 1,2,3,4-gram counts are used in the implementation of the algorithm.
+
+\section{Data}
+
+The data file to train the evaluation model is from hyp1-hyp2-ref. The file consists of a triple (hyp1, hyp2, and ref) where hyp1 and hyp2 are two translations to which is evaluated by the algorithm, along with a reference sentence of the hypothesis curated by a human translator.
+
+The data file dev.answers contains the preference between the two hypothesis translations by a human translator. The numbers correspond to outputs of the function,
+	\[ f(h_{1}, h_{2}, e) = 
+		\begin{cases}
+			\text{1, } &\quad\text{ if $h_{1}$ is preferred to $h_{2}$}\\
+			\text{0, } &\quad\text{if $h_{1}$ is equally good/bad to $h_{2}$}\\
+			\text{-1, } &\quad\text{if $h_{2}$ is preferred to $h_{1}$ }
+		\end{cases} \]
+where $h_{1}$ and $h_{2}$ are the two hypothesis translation and $e$ is the reference translation.
+
+\section{Code}
+
+\subsection{Pseudocode of modified ROSE metric evaluation}
+\begin{algorithm}
+	\KwData{$(hyp1,hyp2,ref)$ in $\mathcal{D} $}
+	\KwResult{ output the function for each triple (hyp1, hyp2, ref) in $\mathcal{D}$}
+	\For{ $(h1, h2, e)$ in $\mathcal{D}$}{
+		vc1, vc2 = [0] * 32, [0] * 32;\\
+		sw1, sw2 = [0] * 13, [0] * 13;\\
+		h1 = $fix\_input$(h1);\\
+		h2 = $fix\_input$(h2);\\
+		(vc1, vc2) = $get\_ngrams$(e, h1, h2, vc1, vc2, TRUE);\\
+		(sw1, sw2) = $get\_ngrams$(rsw(e), rsw(h1), rsw(h2), sw1, sw2, FALSE);\\
+		l1 = ($sum$(vc1[0:13]) + $sum$(sw1) * 1.1) + (vc1[13] * 0.4 ))/2.5;\\
+		l2 = ($sum$(vc2[0:13]) + $sum$(sw2) * 1.1) + (vc1[13] * 0.4 ))/2.5;\\
+		\uIf{l1 == l2}{
+			print 0\;}
+		\uElseIf{$l1 < l2$}{
+			print 1\;}
+		\Else{
+			print -1\;
+			}
+	}
+\end{algorithm}
+
+\subsection{Miscellaneous algorithms used}
+
+The function $get\_ngrams(\cdot)$ is used to calculate the ratio of the n-gram counts $P_{n}$ defined previously. The function $rsw(\cdot)$ outputs the sentence with all the stopwords removed. Stopwords are high frequency words in a given grammar and may be the set that contains the words: "a", "I", and etc.
+
+
+\section{Experimental Setup}
+
+
+
+\section{Results}
+
+
+\section{Analysis of the Results}
+
+\section{Future Work}
+
+\section*{Acknowledgments}
+
+\bibliography{tacl}
+\bibliographystyle{acl2012}
+
+\end{document}
+
+
