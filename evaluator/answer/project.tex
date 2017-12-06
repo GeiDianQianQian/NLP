@@ -16,6 +16,8 @@
 \usepackage{multirow}
 \usepackage{url}
 \usepackage[]{algorithm2e}
+\usepackage[english]{babel}
+\usepackage[bottom]{footmisc}
 \makeatletter
 \newcommand{\@BIBLABEL}{\@emptybiblabel}
 \newcommand{\@emptybiblabel}[1]{}
@@ -40,17 +42,14 @@
 
 \begin{document}
 \maketitle
-\begin{abstract}
-
-\end{abstract}
 
 \section{Motivation}
 
-The motivation of using regression and ranking based optimisation in the machine translation evaluation problem is to improve the accuracy of the evaluation beyond the baseline implementation. The baseline implementation used the METEOR metric for finding precision and recall.
+The motivation of using regression and ranking based optimisation in the machine translation evaluation problem is to improve the accuracy of the evaluation beyond the baseline implementation. The baseline implementation used the METEOR metric for finding precision and recall \cite{lavie2007meteor}.
 
 \section{Approach}
 
-The approach taken to improve from the baseline is partially based on the implementation of the ROSE metric (Song and Cohn, 2011.) The algorithm used two feature vectors. The first feature vector consist of the parameters, preceded by it's ID:
+The approach taken to improve from the baseline is partially based on the implementation of the ROSE metric \cite{song2011regression}. The algorithm used two feature vectors. The first feature vector consist of the parameters, preceded by it's ID:
 	\begin{itemize}
 		\item 1-4: n-gram precision, n=1...4
 		\item 5-8: n-gram recall, n=1...4
@@ -116,19 +115,49 @@ The function $get\_ngrams(\cdot)$ is used to calculate the ratio of the n-gram c
 
 \section{Experimental Setup}
 
+Our experiment compares the accuracy between ROSE and the METEOR metric as shown in the baseline. Method 1 was the baseline implementation of the METRO metric. Methods 2 through 8 are modifications to the ROSE implementation  \cite{song2011regression} and the modifications to the sentence structure of the data set. 
+Table 1 shows the methods implemented to improve the accuracy of the evaluator.
+\begin{center}
+	\begin{tabular}{| l | p{7cm} |}
+	\hline
+	Method & Description \\ \hline
+	1 & METEOR \\ \hline
+	2 & ROSE, only one feature vector with 13 elements \\ \hline
+	3 & ROSE, added second feature vector with sentences without stopwords \\ \hline
+	4 & Removed all characters with punctuation \\ \hline
+	5 & Included scores for n-grams at sentence level. First feature vector contains 14 elements.  \\ \hline
+	6 & Removed all unicode characters and used WordNet to lemmatize sentence input. \\ \hline
+	7 & Used WordNet to check similarities among words \\ \hline
+	8 & Used levenshtein distance \\ \hline
+	\end{tabular}
+\end{center}
+	
 
+\subsection{Results}
 
-\section{Results}
+\begin{center}
+	\begin{tabular}{| l | l | l | l |}
+	\hline
+	Method & Time Execution $\footnotemark[1] $& Dev Score & Test Score \\ \hline
+	1 & 1min 33sec & 0.510169 & 0.529 \\ \hline
+	2 & 11sec & 0.512868 & 0.529 \\ \hline
+	3 & 50sec & 0.517365 & 0.533 \\ \hline
+	4 & 48sec & 0.519008 & 0.539 \\ \hline
+	5 & 55sec & 0.520103 & 0.541 \\ \hline
+	6 & 4min 51sec & 0.523115 & 0.546 \\ \hline
+	7 & 5min 43sec & 0.526166 & 0.547 \\ \hline
+	8 & 6min 17sec & 0.530742 & 0.548 \\ \hline
+	\end{tabular}
+\end{center}
+\footnotetext[1]{Time of execution is based on the performance of a 2.2GHz quad-core Intel Core i7 processor MacBook Pro}
 
-
-\section{Analysis of the Results}
+\subsection{Analysis of the Results}
 
 \section{Future Work}
+Future work that extends the partial implementation of the ROSE metric would be to use a special kernel for categorizing text documents \cite{lodhi2002text}. In order to improve upon ROSE and BLEU, methods for combining scores from partial syntactic dependency matches along with n-gram matches using a statistical parser as presented in the paper \cite{kahn2009expected}.
 
-\section*{Acknowledgments}
-
-\bibliography{tacl}
 \bibliographystyle{acl2012}
+\bibliography{References}
 
 \end{document}
 
