@@ -1,0 +1,30 @@
+Methods:
+
+- Method 1. METEOR (baseline)
+- Method 2. ROSE (only 1 feature vector comparing at sentence level with 13 elements (not custom)).
+- Method 3. ROSE (2 feature vectors, both 13 elements comparing at sentence level. One is for scores (1-gram through 4-gram, calculating precision, recall and f1-measure) the regular sentence and the other is scores the same sentence without stopwords (not custom). It also put all characters in lower case).
+- Method 4. It is same as Method 3, but we remove all chars with punctuation from the input.
+- Method 5. An improvement of Method 4 by including scores for ngrams at sentence level. The first feature vector now has 14 elements.
+- Method 6. An improvement of Method 5. Removes all unicode characters from the sentence and uses Wordnet to lemmatize the input.
+- Method 7. An improvement of Method 6. Uses Wordnet to check similarity among words.
+- Method 8. An improvement of Method 7. Uses levenshtein distance in case that wordnet did not find.
+
+| Method                  | Time execution | Dev Score | Test Score | 
+| :---------------------: | :------------: | :-------: | :--------: |
+| Method1                 | 1min 33sec     | 0.510169  | 0.529      |
+| Method2                 | 11sec          | 0.512868  | 0.529      |
+| Method3                 | 50sec          | 0.517365  | 0.533      |
+| Method4                 | 48sec          | 0.519008  | 0.539      |
+| Method5                 | 55sec          | 0.520103  | 0.541      |
+| Method6                 | 4min 51sec     | 0.523115  | 0.546      |
+| Method7                 | 5min 43sec     | 0.526166  | 0.547      |
+| Method8                 | 6min 17sec     | 0.530742  | 0.548      |
+
+Evaluation Environment:
+Macbook Pro:
+- 2.2GHz quad-core Intel Core i7 processor
+
+Future work would be:
+- Text Classification using String Kernels: http://jmlr.org/papers/volume2/lodhi02a/lodhi02a.pdf
+- Expected Dependency Pair Match: Predicting translation quality with expected syntactic
+structure: http://ssli.ee.washington.edu/people/jgk/dist/metaweb/mtjournal.pdf
