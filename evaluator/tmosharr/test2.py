@@ -1,8 +1,10 @@
 import math
+import nltk
 from collections import Counter
 import argparse  # optparse is deprecated
 from itertools import islice  # slicing for iterators
 import numpy as np
+
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
 parser.add_argument('-i', '--input', default='data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
@@ -99,4 +101,5 @@ def bl(h1, h2, e):
         return -1
 
 for h1, h2, e in islice(sentences(), opts.num_sentences):
-    print bl(h1, h2, e)
+    print nltk.pos_tag(h1)
+
