@@ -8,6 +8,8 @@ Methods:
 - Method 6. An improvement of Method 5. Removes all unicode characters from the sentence and uses Wordnet to lemmatize the input.
 - Method 7. An improvement of Method 6. Uses Wordnet to check similarity among words.
 - Method 8. An improvement of Method 7. Uses levenshtein distance in case that wordnet did not find.
+- Method 9. customised ROSE, Uses 27 features, 13 from original ROSE algorithm + 14 custome features. Pre defined weights for features.
+- Method 10. Machine Learning with Neural Network for 30 epochs. Weights of features of Method9 are learned to maximize accuracy.      
 
 | Method                  | Time execution | Dev Score | Test Score | 
 | :---------------------: | :------------: | :-------: | :--------: |
@@ -19,7 +21,8 @@ Methods:
 | Method6                 | 4min 51sec     | 0.523115  | 0.546      |
 | Method7                 | 5min 43sec     | 0.526166  | 0.547      |
 | Method8                 | 6min 17sec     | 0.530742  | 0.548      |
-
+| Method9                 | 6min 17sec     | 0.537038  | 0.555      |
+| Method10                | 14min 30 sec   | 0.549867  | 0.564      |
 Evaluation Environment:
 Macbook Pro:
 - 2.2GHz quad-core Intel Core i7 processor

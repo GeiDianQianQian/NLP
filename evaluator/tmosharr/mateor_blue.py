@@ -1,121 +1,241 @@
 #!/usr/bin/env python
+import sys
 import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
-import math
-from collections import Counter
-import argparse  # optparse is deprecated
-from itertools import islice  # slicing for iterators
-import numpy as np
+from nltk.corpus import stopwords
+from nltk.corpus import wordnet as wdn
+from nltk.stem import wordnet as wn
+from nltk import pos_tag
+from nltk import word_tokenize
+from itertools import chain
+import string
+import nltk
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
-parser.add_argument('-i', '--input', default='data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
+parser.add_argument('-i', '--input', default='./data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
+parser.add_argument('-m', '--model', default='./model/ngram_model', help='input file (model)')
 parser.add_argument('-n', '--num_sentences', default=None, type=int, help='Number of hypothesis pairs to evaluate')
-parser.add_argument('-a', '--alpha', default=0, type=float, help='Number of hypothesis pairs to evaluate')
-parser.add_argument('-b', '--beta', default=4.0, type=float, help='Number of hypothesis pairs to evaluate')
+parser.add_argument('-a', '--alpha', default=0.1, type=float, help='Number of hypothesis pairs to evaluate')
+parser.add_argument('-b', '--beta', default=3.0, type=float, help='Number of hypothesis pairs to evaluate')
 parser.add_argument('-g', '--gamma', default=0.5, type=float, help='Number of hypothesis pairs to evaluate')
 opts = parser.parse_args()
 
+cachedStopWords = stopwords.words("english")
+wnlemma = wn.WordNetLemmatizer()
+ngram_dict = {}
 
-def word_matches(h, e):
+
+def wn_contains(word, ref):
+    synonyms = wdn.synsets(''.join(word))
+    synset = set(chain.from_iterable([word.lemma_names() for word in synonyms]))
+    refset = set([''.join(r) for r in ref])
+    result = bool(synset & refset)
+    return result  # check intersection of sets
+
+
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[
+                             j + 1] + 1  # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1  # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+
+    return previous_row[-1]
+
+
+def is_similar(word, ref):
+    synonyms = [word.lemma_names() for word in wdn.synsets(''.join(word))]
+    words = [''.join(r) for r in ref]
+    for syn in chain.from_iterable(synonyms):
+        for w in words:
+            if levenshtein(str(syn), str(w)) > 0.8:
+                return True
+    return False
+
+
+def matches(h, e):
     r = 0.0
     p = 0.0
-    m = sum(1 for w in h if w in e) + 0.0001
-    r = float(m)/float(len(e))
-    p = float(m)/float(len(h))
-    return p, r, m
+    m = 0.0001
+    for w in h:
+        if w in e or wn_contains(w, e) or is_similar(w, e):
+            m += 1
+    r = float(m)/float(len(e)) if e else 0.0001
+    p = float(m)/float(len(h)) if h else 0.0001
+    f = 2 * p * r / (p + r)
+    return p, r, f
+
+
+def str_matches(h, e):
+    p = 0.0
+    m = 0.0001
+    for w in h:
+        if w in e:
+            m += 1
+    p = float(m)/float(len(h)) if h else 0.0001
+    return p
+
+
+def get_type_wordnet(tag):
+    ADJ, ADV, NOUN, VERB = 'a', 'r', 'n', 'v'
+    if tag.startswith('N'):
+        return NOUN
+    elif tag.startswith('V'):
+        return VERB
+    elif tag.startswith('J'):
+        return ADJ
+    elif tag.startswith('R'):
+        return ADV
+    return VERB
 
 
 def sentences():
     with open(opts.input) as f:
         for pair in f:
-            yield [sentence.strip().split() for sentence in pair.split(' ||| ')]
+            value = [[],[],[]]
+            for i,sentence in enumerate(pair.split(' ||| ')):
+                sentence = sentence.decode('unicode_escape').encode('ascii', 'ignore').lower()
+                arr = [wnlemma.lemmatize(''.join(w[:1]), get_type_wordnet(''.join(w[1:])))
+                             for w in pos_tag(word_tokenize(sentence))]
+                value[i] = str(" ".join(arr)).translate(None, string.punctuation).strip().split()
+            yield value
 
 
-def lcs(s1, s2):
-   m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
-   longest, x_longest = 0, 0
-   for x in xrange(1, 1 + len(s1)):
-       for y in xrange(1, 1 + len(s2)):
-           if s1[x - 1] == s2[y - 1]:
-               m[x][y] = m[x - 1][y - 1] + 1
-               if m[x][y] > longest:
-                   longest = m[x][y]
-                   x_longest = x
-           else:
-               m[x][y] = 0
-   return s1[x_longest - longest: x_longest]
+def get_model():
+    with open(opts.model) as f:
+        for pair in f:
+            yield tuple(pair.split(' ||| '))
 
-
-def get_c(s1, s2):
-    mylist=[]
-    while lcs(s2,s1) != []:
-        x = lcs(s2, s1)
-        mylist.append(x)
-        s1 = [i for i in s1 if i not in x]
-        s2 = [i for i in s2 if i not in x]
-    return len(mylist)
-
-
-# Collect BLEU-relevant statistics for a single sentence/reference pair.
-# Return value is a generator yielding:
-# (c, r, numerator1, denominator1, ... numerator4, denominator4)
-# Summing the columns across calls to this function on an entire corpus will
-# produce a vector of statistics that can be used to compute BLEU (below)
-def bleu_stats(sentence, reference):
-    stats = []
-    stats.append(len(sentence))
-    stats.append(len(reference))
-    for n in xrange(1, 5):
-        s_ngrams = Counter([tuple(sentence[i:i + n]) for i in xrange(len(sentence) + 1 - n)])
-        r_ngrams = Counter([tuple(reference[i:i + n]) for i in xrange(len(reference) + 1 - n)])
-        stats.append(max([sum((s_ngrams & r_ngrams).values()), 0]))
-        stats.append(max([len(sentence) + 1 - n, 0]))
-    return stats
-
-
-# Compute BLEU from collected statistics obtained by call(s) to bleu_stats
-def bleu(stats):
-    if len(filter(lambda x: x == 0, stats)) > 0:
-        return 0
-    (c, r) = stats[:2]
-    bleu_prec = sum([math.log(float(x) / y) for x, y in zip(stats[2::2], stats[3::2])])
-    return math.exp(min([0, 1 - float(r) / c]) + 0.25 * bleu_prec)
-
-
-# A modification of BLEU that returns a positive value even when some
-# higher-order precisions are zero. From Liang et al. 2006 (Footnote 5):
-# http://aclweb.org/anthology-new/P/P06/P06-1096.pdf
-def smoothed_bleu(stats):
-    return sum([bleu(stats[:2 + 2 * i]) / math.pow(2, 4 - i + 1) for i in xrange(1, 5)])
-
-
-def bl(h1, h2, e):
-    stats1 = bleu_stats(h1, e)
-    stats2 = bleu_stats(h2, e)
-    score1 = smoothed_bleu(stats1)
-    score2 = smoothed_bleu(stats2)
-    if score1 > score2:
-        return 1
-    elif score1 == score2:
-        return 0
+def score_ngram(ngram):
+    if ngram in ngram_dict:
+        return ngram_dict[ngram]
     else:
-        return -1
+        return -10
 
 
-for h1, h2, e in islice(sentences(), opts.num_sentences):
-    p1, r1, m1 = word_matches(h1, e)
-    p2, r2, m2 = word_matches(h2, e)
-    c1 = get_c(h1, e)
-    c2 = get_c(h2, e)
-    l1 = (1-opts.gamma*(c1/m1)**opts.beta)*p1*r1/((1-opts.alpha)*r1+opts.alpha*p1)
-    l2 = (1-opts.gamma*(c2/m2)**opts.beta)*p2*r2/((1-opts.alpha)*r2+opts.alpha*p2)
-    if l1 > l2:
+def fix_input(h):
+    h = [w.replace("&quot;", '"') for w in h]
+    return h
+
+
+def rsw(h):
+    return [word for word in h if word not in cachedStopWords]
+
+
+def word_classifier(h):
+    words = []
+    func  = []
+    cont  = []
+    for word in h:
+        if word not in cachedStopWords:
+            cont.append(word)
+        else:
+            func.append(word)
+        words.append(word)
+    return words, func, cont
+
+
+def rose(e, h1, h2, str_pos_e, str_pos_h1, str_pos_h2, pos_e, pos_h1, pos_h2,
+         e_words, e_func, e_cont, h1_words, h1_func, h1_cont, h2_words, h2_func, h2_cont, vc1, vc2):
+    score_cand1 = 0
+    score_cand2 = 0
+    for n in xrange(1, 5):
+        e_ngrams  = [tuple(e[i:i + n]) for i in xrange(len(e) + 1 - n)]
+        h1_ngrams = [tuple(h1[i:i + n]) for i in xrange(len(h1) + 1 - n)]
+        h2_ngrams = [tuple(h2[i:i + n]) for i in xrange(len(h2) + 1 - n)]
+        (vc1[n - 1], vc1[n + 3], vc1[n + 7]) = matches(h1_ngrams, e_ngrams)
+        (vc2[n - 1], vc2[n + 3], vc2[n + 7]) = matches(h2_ngrams, e_ngrams)
+        for i in xrange(len(h1) + 1 - n):
+            score_cand1 += score_ngram(tuple(h1[i:i + n]))
+        for i in xrange(len(h2) + 1 - n):
+            score_cand2 += score_ngram(tuple(h2[i:i + n]))
+
+
+    # average of ngrams
+    vc1[12] = (vc1[0] + vc1[1] + vc1[2] + vc1[3]) / 4
+    vc2[12] = (vc2[0] + vc2[1] + vc2[2] + vc2[3]) / 4
+    vc1[13] = abs(len(e_words) - len(h1_words))
+    vc2[13] = abs(len(e_words) - len(h2_words))
+    vc1[14] = abs(len(e_func) - len(h1_func))
+    vc2[14] = abs(len(e_func) - len(h2_func))
+    vc1[15] = abs(len(e_cont) - len(h1_cont))
+    vc2[15] = abs(len(e_cont) - len(h2_cont))
+    vc1[16] = score_cand1 / 100
+    vc2[16] = score_cand2 / 100
+
+    for n in xrange(1, 5):
+        e_ngrams =  [tuple(pos_e[i:i + n]) for i in xrange(len(pos_e) + 1 - n)]
+        h1_ngrams = [tuple(pos_h1[i:i + n]) for i in xrange(len(pos_h1) + 1 - n)]
+        h2_ngrams = [tuple(pos_h2[i:i + n]) for i in xrange(len(pos_h2) + 1 - n)]
+        (vc1[n + 16], vc1[n + 20], vc1[n + 24]) = matches(h1_ngrams, e_ngrams)
+        (vc2[n + 16], vc2[n + 20], vc2[n + 24]) = matches(h2_ngrams, e_ngrams)
+
+    for n in xrange(1, 5):
+        e_ngrams =  [tuple(str_pos_e[i:i + n]) for i in xrange(len(str_pos_e) + 1 - n)]
+        h1_ngrams = [tuple(str_pos_h1[i:i + n]) for i in xrange(len(str_pos_h1) + 1 - n)]
+        h2_ngrams = [tuple(str_pos_h2[i:i + n]) for i in xrange(len(str_pos_h2) + 1 - n)]
+        vc1[n + 28] = str_matches(h1_ngrams, e_ngrams)
+        vc2[n + 28] = str_matches(h2_ngrams, e_ngrams)
+
+    return (vc1, vc2)
+
+
+for words, count in get_model():
+    tp = tuple(words.split())
+    ngram_dict[tp] = float(count)
+
+
+wt = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2, 2, 2, 2, 2, 0.1, 0.1, 0.1,
+      0.4, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2, 2, 2, 2, 2, 2, 2, 2]
+
+
+for n, (h1, h2, e) in enumerate(islice(sentences(), opts.num_sentences)):
+
+    if n%500 == 0:
+        sys.stderr.write(str(n/500)+' percent\n')
+    h1 = fix_input(h1)
+    h2 = fix_input(h2)
+    e  = fix_input(e)
+
+    str_pos_h1 = nltk.pos_tag(h1)
+    str_pos_h2 = nltk.pos_tag(h2)
+    str_pos_e  = nltk.pos_tag(e)
+
+    pos_h1 = [tup[1] for tup in str_pos_h1]
+    pos_h2 = [tup[1] for tup in str_pos_h2]
+    pos_e  = [tup[1] for tup in str_pos_e ]
+
+    h1_words, h1_func, h1_cont = word_classifier(h1)
+    h2_words, h2_func, h2_cont = word_classifier(h2)
+    e_words,  e_func,  e_cont  = word_classifier(e)
+
+    vc1, vc2 = [0] * 33, [0] * 33
+    (vc1, vc2) = rose(e, h1, h2, str_pos_e, str_pos_h1, str_pos_h2, pos_e, pos_h1, pos_h2,
+                            e_words, e_func, e_cont, h1_words, h1_func, h1_cont, h2_words, h2_func, h2_cont, vc1, vc2)
+
+    l1 = 0.0
+    l2 = 0.0
+    for i in range(len(wt)):
+        l1 += vc1[i] * wt[i]
+        l2 += vc2[i] * wt[i]
+    if l1 == l2:
+        print 0
+    elif l1 > l2:
         print 1
-    elif l1 == l2:
-        print bl(h1, h2, e)
     else:
         print -1
-
 
 

@@ -9,9 +9,13 @@ from nltk import pos_tag
 from nltk import word_tokenize
 from itertools import chain
 import string
+import nltk
+import sys
+import csv
 
 parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
 parser.add_argument('-i', '--input', default='./data/hyp1-hyp2-ref', help='input file (default data/hyp1-hyp2-ref)')
+parser.add_argument('-r', '--truth', default='./data/dev.answers', help='input file (default data/hyp1-hyp2-ref)')
 parser.add_argument('-m', '--model', default='./model/ngram_model', help='input file (model)')
 parser.add_argument('-n', '--num_sentences', default=None, type=int, help='Number of hypothesis pairs to evaluate')
 parser.add_argument('-a', '--alpha', default=0.1, type=float, help='Number of hypothesis pairs to evaluate')
@@ -155,18 +159,49 @@ for words, count in get_model():
     tp = tuple(words.split())
     ngram_dict[tp] = float(count)
 
-for h1, h2, e in islice(sentences(), opts.num_sentences):
+wt = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1,
+       0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275, 0.275]
+
+mat = np.zeros(shape=(51135, 27))
+
+header = ['f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9',
+          'f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18', 'f19',
+          'f20', 'f21', 'f22', 'f23', 'f24', 'f25', 'f26']
+
+truth=[]
+with open(opts.truth) as ref:
+    for t in ref:
+        truth.append(int(t.strip()))
+print(len(truth))
+for n, (h1, h2, e) in enumerate(islice(sentences(), opts.num_sentences)):
+    #if n >= 25568:
+        #break
+    if n%500 == 0:
+        sys.stderr.write(str(n/500)+' percent\n')
     vc1, vc2  = [0] * 14, [0] * 14 # feature vector h1
     sw1, sw2 = [0] * 13, [0] * 13
     h1 = fix_input(h1)
     h2 = fix_input(h2)
     (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2, True) 
     (sw1, sw2) = get_ngrams(rsw(e), rsw(h1), rsw(h2), sw1, sw2, False)
-    l1 = (sum(vc1[0:8])*0.5 + (sum(vc1[8:13]) * 2) + (sum(sw1) * 1.1) + (vc1[13]*0.4))/4
-    l2 = (sum(vc2[0:8])*0.5 + (sum(vc2[8:13]) * 2) + (sum(sw2) * 1.1) + (vc2[13]*0.4))/4
-    if l1 == l2:
+    vc1.extend(sw1)
+    vc2.extend(sw2)
+    diff = list(np.subtract(vc1, vc2))
+    #diff.append(truth[n])
+    mat[n]=diff
+    '''
+    l= 0.0
+    for i in range(len(wt)):
+        l+=wt[i]*diff[i]
+    if l == 0:
         print 0
-    elif l1 > l2:
+    elif l > 0:
         print 1
     else:
         print -1
+    '''
+
+with open('feature_values_test.csv', 'wb') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(mat)

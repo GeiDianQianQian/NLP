@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 import numpy as np
@@ -25,9 +26,6 @@ wnlemma = wn.WordNetLemmatizer()
 ngram_dict = {}
 
 def wn_contains(word, ref):
-    # compare only unigrams
-    if len(word) > 1:
-        return False
     synonyms = wdn.synsets(''.join(word))
     synset   = set(chain.from_iterable([word.lemma_names() for word in synonyms]))
     refset   = set([''.join(r) for r in ref])
@@ -55,9 +53,6 @@ def levenshtein(s1, s2):
     return previous_row[-1]
 
 def is_similar(word, ref):
-    # compare only unigrams
-    if len(word) > 1:
-        return False
     synonyms = [word.lemma_names() for word in wdn.synsets(''.join(word))]
     words = [''.join(r) for r in ref]
     for syn in chain.from_iterable(synonyms):
@@ -71,8 +66,6 @@ def matches(h, e):
     p = 0.0
     m = 0.0001
     for w in h:
-        # 'wn_contains' is expensive, so it only goes there
-        # in case that we did not find it (a second try)
         if w in e or wn_contains(w, e) or is_similar(w, e):
             m += 1
     r = float(m)/float(len(e)) if e else 0.0001
@@ -90,7 +83,6 @@ def get_type_wordnet(tag):
         return ADJ
     elif tag.startswith('R'):
         return ADV
-    
     return VERB
 
 def sentences():
@@ -98,10 +90,9 @@ def sentences():
         for pair in f:
             value = [[],[],[]]
             for i,sentence in enumerate(pair.split(' ||| ')):
-                sentence = sentence.decode('unicode_escape').encode('ascii','ignore').lower()
+                sentence = sentence.decode('unicode_escape').encode('ascii', 'ignore').lower()
                 arr = [wnlemma.lemmatize(''.join(w[:1]), get_type_wordnet(''.join(w[1:])))
                              for w in pos_tag(word_tokenize(sentence))]
-                # remove punctuation
                 value[i] = str(" ".join(arr)).translate(None, string.punctuation).strip().split()
             yield value
 
@@ -116,31 +107,32 @@ def score_ngram(ngram):
     else:
         return -10
 
-def get_ngrams(reference, cand1, cand2, vc1, vc2, long):
+def get_ngrams(refer, cand1, cand2, pos_refer, pos_cand1, pos_cand2, vc1, vc2):
     score_cand1 = 0
     score_cand2 = 0
-    for n in xrange(1,5):
-        e_ngrams  = [tuple(reference[i:i+n]) for i in xrange(len(reference)+1-n)]
+    for n in xrange(1, 5):
+        e_ngrams  = [tuple(refer[i:i+n]) for i in xrange(len(refer)+1-n)]
         h1_ngrams = [tuple(cand1[i:i+n]) for i in xrange(len(cand1)+1-n)]
         h2_ngrams = [tuple(cand2[i:i+n]) for i in xrange(len(cand2)+1-n)]
-
-        if long:
-            for i in xrange(len(cand1)+1-n):
-                score_cand1 += score_ngram(tuple(cand1[i:i+n]))
-            for i in xrange(len(cand2)+1-n):
-                score_cand2 += score_ngram(tuple(cand2[i:i+n]))
-
-        # save precison, score and f1 for ngrams
+        for i in xrange(len(cand1)+1-n):
+            score_cand1 += score_ngram(tuple(cand1[i:i+n]))
+        for i in xrange(len(cand2)+1-n):
+            score_cand2 += score_ngram(tuple(cand2[i:i+n]))
         (vc1[n-1], vc1[n+3], vc1[n+7]) = matches(h1_ngrams, e_ngrams)
         (vc2[n-1], vc2[n+3], vc2[n+7]) = matches(h2_ngrams, e_ngrams)
 
     # average of ngrams
     vc1[12] = (vc1[0]+vc1[1]+vc1[2]+vc1[3])/4
     vc2[12] = (vc2[0]+vc2[1]+vc2[2]+vc2[3])/4
+    vc1[13] = score_cand1/100
+    vc2[13] = score_cand2/100
 
-    if long:
-        vc1[13] = score_cand1/100
-        vc2[13] = score_cand2/100
+    for n in xrange(1, 5):
+        e_ngrams  = [tuple(pos_refer[i:i + n]) for i in xrange(len(pos_refer) + 1 - n)]
+        h1_ngrams = [tuple(pos_cand1[i:i + n]) for i in xrange(len(pos_cand1) + 1 - n)]
+        h2_ngrams = [tuple(pos_cand2[i:i + n]) for i in xrange(len(pos_cand2) + 1 - n)]
+        (vc1[n + 13], vc1[n + 17], vc1[n + 21]) = matches(h1_ngrams, e_ngrams)
+        (vc2[n + 13], vc2[n + 17], vc2[n + 21]) = matches(h2_ngrams, e_ngrams)
 
     return (vc1, vc2)
 
@@ -148,20 +140,29 @@ def fix_input(h):
     h = [w.replace("&quot;", '"') for w in h]
     return h
 
+
 # remove stop words
 def rsw(h):
     return [word for word in h if word not in cachedStopWords]
+
 
 for words, count in get_model():
     tp = tuple(words.split())
     ngram_dict[tp] = float(count)
 
-for h1, h2, e in islice(sentences(), opts.num_sentences):
+for n, (h1, h2, e) in enumerate(islice(sentences(), opts.num_sentences)):
+    if n%100 == 0:
+        sys.stderr.write(str(n)+'\n')
+    pos_h1 = [tup[1] for tup in nltk.pos_tag(h1)]
+    pos_h2 = [tup[1] for tup in nltk.pos_tag(h2)]
+    pos_e =  [tup[1] for tup in nltk.pos_tag(e)]
     h1 = fix_input(h1)
     h2 = fix_input(h2)
-    vc1, vc2  = [0] * 14, [0] * 14
-    (vc1, vc2) = get_ngrams(e, h1, h2, vc1, vc2, True)
-    wt = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2, 2, 2, 2, 2, 0.4]
+    vc1, vc2  = [0] * 26, [0] * 26
+    (vc1, vc2) = get_ngrams(e, h1, h2, pos_e, pos_h1, pos_h2, vc1, vc2)
+    wt = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2, 2, 2, 2, 2, 0.4, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2, 2, 2, 2]
+    l1=0.0
+    l2=0.0
     for i in range(len(wt)):
         l1+=vc1[i]*wt[i]
         l2+=vc2[i]*wt[i]
