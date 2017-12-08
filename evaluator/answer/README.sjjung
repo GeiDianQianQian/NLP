@@ -1,0 +1,35 @@
+## Decoding - Homework 4 - CMPT 825 & CMPT 413
+> This README file constains information about the taks performed by `sjjung` on Homework 4.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+To get an output, run the decode.py located in the answer folder. It takes approximately 47 min on a Macbook Pro (i7).
+
+------------------------------------------------------
+$ python decode.py > output
+------------------------------------------------------
+
+The oupput file will be created within the answer folder, containing the decoded result of the input.
+To test the output file, simply use the output as an input to score-decoder.py
+
+------------------------------------------------------
+$ python score-decoder.py < output
+------------------------------------------------------
+
+
+
+
+
+### Seung Jin Jung - sjjung
+- Pair programmed with jylew, trying to implement the baseline
+- Attemped to improve the model implemented by lperesde and tmosharr with given reference
+- Writing documentation for the project
+- Prepared files for submission
+
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Fri Nov 24 16:00:18 2017 -0800 | sjjung | testing ./decoder/decode.py | cf0f703
+| Fri Nov 24 15:44:10 2017 -0800 | sjjung | preparing for submission | 00632fa
+| Fri Nov 24 15:23:45 2017 -0800 | sjjung | README files updated | 5da5fcc
+| Fri Nov 24 15:10:03 2017 -0800 | sjjung | adding README files | cea5a2e

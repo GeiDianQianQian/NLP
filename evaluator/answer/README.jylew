@@ -1,0 +1,34 @@
+## Decoding - Homework 4 - CMPT 825 & CMPT 413
+> This README file constains information about the taks performed by `jylew` on Homework 4.
+The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+### Instructions on how to run:
+To get an output, run the decode.py located in the answer folder. It takes approximately 47 min on a Macbook Pro (i7).
+
+------------------------------------------------------
+$ python decode.py > output
+------------------------------------------------------
+
+The oupput file will be created within the answer folder, containing the decoded result of the input.
+To test the output file, simply use the output as an input to score-decoder.py
+
+------------------------------------------------------
+$ python score-decoder.py < output
+------------------------------------------------------
+
+
+
+
+
+### Justin Lew - jylew
+- Pair programmed with sjjung, trying to implement the baseline
+- Attemped to improve the model implemented by lperesde and tmosharr with given reference
+- Writing documentation for the project
+- Documented the implemented pesudocode using LaTeX
+
+### Log
+| Date | Author | Message | Abbreviated Hash |
+| Thu Nov 23 22:19:47 2017 -0800 | jylew | pdflatex | 4406fa8
+| Thu Nov 23 22:09:40 2017 -0800 | jylew | finished pseudocode | c59ecb5
+| Thu Nov 23 21:11:10 2017 -0800 | jylew | documentation | ea2c21f
+| Thu Nov 23 15:39:51 2017 -0800 | jylew | First attempt | 23e48a4
