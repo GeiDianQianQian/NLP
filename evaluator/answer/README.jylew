@@ -3,40 +3,37 @@
 > This README file constains information about the taks performed by `tmosharr` on the Final Project.
 The description of the model used, approaches made, and further analysis are documented in a separate file. You can learn more about the evaluation methodology taken in this project by viewing project.pdf located in the answer folder.
 
-
-
 ### Instructions on how to run:
 
 To begin with, followings must be installed to run evaluator.py
 	- Python 2.7
 	- NLTK
 	- NLTK Data
+	- Keras library
+	- Tensorflow
 
 To get an output, run the evaluator.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python evaluator.py > output
+$ python evaluator.py 
 ------------------------------------------------------
 
-Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
+It will automatically generate feat_train.csv and feat_test.csv in same directory.
+
+Next step is to use the neural network to create output files 
 
 ------------------------------------------------------
-$ python check.py < output
+$ python deep_learning.py > output 
 ------------------------------------------------------
 
-Final step is to compare the result of evaluator.py with the result of human annotator.
+Next step is to compare the output with the result of human annotator.
 
 ------------------------------------------------------
 $ python score-evaluation.py < output
 ------------------------------------------------------
 
 Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
-Another way of running the evaluator.py is the following:
-
-------------------------------------------------------
-$ python evaluator.py | python check.py | python score-evaluation.py
-------------------------------------------------------
 
 
 
