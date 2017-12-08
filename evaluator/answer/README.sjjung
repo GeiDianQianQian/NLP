@@ -21,10 +21,7 @@ $ python score-decoder.py < output
 
 
 ### Seung Jin Jung - sjjung
-- Pair programmed with jylew, trying to implement the baseline
-- Attemped to improve the model implemented by lperesde and tmosharr with given reference
-- Writing documentation for the project
-- Prepared files for submission
+
 
 
 ### Log

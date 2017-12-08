@@ -20,13 +20,8 @@ $ python score-decoder.py < output
 
 
 ### Turash Mosharraf - tmosharr
-- Improved the baseline model
-- Implemented algorithms from given references
-- Research on how to improve the execution speed
-- Tried various approaches to improve the model
-- Bug fixes
-- Created log files for debugging purpose
-- Prepared files for submission
+- Implemented the Baseline
+- Setup of GitLab project by commiting initial files
 
 
 ### Log

@@ -22,9 +22,8 @@ $ python score-decoder.py < output
 
 ### Justin Lew - jylew
 - Pair programmed with sjjung, trying to implement the baseline
-- Attemped to improve the model implemented by lperesde and tmosharr with given reference
-- Writing documentation for the project
-- Documented the implemented pesudocode using LaTeX
+- Writing documentation for the project including READme files and the report
+- Programmed using LaTeX
 
 ### Log
 | Date | Author | Message | Abbreviated Hash |

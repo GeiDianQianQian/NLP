@@ -20,11 +20,9 @@ $ python score-decoder.py < output
 
 
 ### Luiz Fernando Peres de Oliveira - lperesde
-- Setup of GitLab project by commiting initial files
-- Succesfully implemented baseline model
-- Initial submission with a score of -1346, surpassing the baseline model score
-- Testing results against given references.
-- Bug fixes
+- Improved the baseline by adding feature vector
+- Took various ways to improve the score little by little
+
 
 
 ### Log
