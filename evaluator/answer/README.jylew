@@ -7,43 +7,48 @@ The description of the model used, approaches made, and further analysis are doc
 
 ### Instructions on how to run:
 
-To begin with, followings must be installed to run evaluator.py
+To begin with, followings must be installed to render the score
 	- Python 2.7
 	- NLTK
 	- NLTK Data
+	- Keras
+	- Tensorflow
 
-To get an output, run the evaluator.py located in the evaluator folder.
+Run the "evaluator.py" located in the evaluator folder.
+
+-----------------------------------------------------------------------------------
+$ python evaluator.py
+-----------------------------------------------------------------------------------
+
+"feat_train.csv" and "feat_test.csv" files will be autimatically created within the folder, containing the feature vector values.
+Run "deep_learning.py" with an additional command to save the output values.
+"deep_learning.py" will take "feat_train.csv" and "feat_test.csv" by default.
+
+-----------------------------------------------------------------------------------
+$ python deep_learning.py > output
+-----------------------------------------------------------------------------------
+
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
+Before testing the score, you can run "check.py" to check the output. If there are any errors, "check.py" will report.
 
-------------------------------------------------------
-$ python evaluator.py > output
-------------------------------------------------------
-
-Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
-
-------------------------------------------------------
+-----------------------------------------------------------------------------------
 $ python check.py < output
-------------------------------------------------------
+-----------------------------------------------------------------------------------
 
-Final step is to compare the result of evaluator.py with the result of human annotator.
+Final step is to compare the result with the result of human annotator.
 
-------------------------------------------------------
+-----------------------------------------------------------------------------------
 $ python score-evaluation.py < output
-------------------------------------------------------
+-----------------------------------------------------------------------------------
 
-Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
-Another way of running the evaluator.py is the following:
-
-------------------------------------------------------
-$ python evaluator.py | python check.py | python score-evaluation.py
-------------------------------------------------------
+"score-evaluation.py" will provide the compared scores along with the accuracy of the output.
 
 
 
 ### Justin Lew - jylew
 
 - Pair programmed with sjjung to go through the project
-- Writing documentation for the project including READme files and the report
+- Writing documentation for the report
 - Converted the project description into proper LaTeX form.
 
 
@@ -54,5 +59,3 @@ $ python evaluator.py | python check.py | python score-evaluation.py
 | Thu Dec 7 15:02:47 2017 -0800 | jylew | added References to paper | fbe4808 |
 | Wed Dec 6 15:32:26 2017 -0800 | jylew | almost done paper, added bibtex file for reference | bfdd64b |
 | Tue Dec 5 01:54:08 2017 -0800 | jylew | started paper | e51c581 |
-
-
