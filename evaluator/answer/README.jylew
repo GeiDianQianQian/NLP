@@ -18,8 +18,6 @@ $ python score-decoder.py < output
 
 
 
-
-
 ### Justin Lew - jylew
 - Pair programmed with sjjung, trying to implement the baseline
 - Writing documentation for the project including READme files and the report
