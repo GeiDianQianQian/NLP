@@ -95,16 +95,15 @@ where $h_{1}$ and $h_{2}$ are the two hypothesis translation and $e$ is the refe
 		output $\alpha$\;
 	}
 \end{algorithm}
-
 \subsection{Miscellaneous algorithms used}
 
-The function $get\_ngrams(\cdot)$ is used to calculate the ratio of the n-gram counts $P_{n}$ defined previously. The function $rsw(\cdot)$ outputs the sentence with all the stopwords removed. Stopwords are high frequency words in a given grammar and may be the set that contains the words: "a", "I", and etc.
+%The function $get\_ngrams(\cdot)$ is used to calculate the ratio of the n-gram counts $P_{n}$ defined previously. The function $rsw(\cdot)$ outputs the sentence with all the stopwords removed. Stopwords are high frequency words in a given grammar and may be the set that contains the words: "a", "I", and etc.
 \section{Experimental Setup}
 
 Our experiment compares the accuracy between ROSE and the METEOR metric as shown in the baseline. Method 1 was the baseline implementation of the METRO metric. Methods 2 through 8 are modifications to the ROSE implementation  \cite{song2011regression} and the modifications to the sentence structure of the data set. 
 Table 1 shows the methods implemented to improve the accuracy of the evaluator.
 \begin{center}
-	\begin{tabular}{| l | p{7cm} |}
+	\begin{tabular}{| l | p{6.3cm} |}
 	\hline
 	Method & Description \\ \hline
 	1 & METEOR \\ \hline
