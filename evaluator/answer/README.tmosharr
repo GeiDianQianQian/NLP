@@ -3,15 +3,13 @@
 > This README file constains information about the taks performed by `tmosharr` on the Final Project.
 The description of the model used, approaches made, and further analysis are documented in a separate file. You can learn more about the evaluation methodology taken in this project by viewing project.pdf located in the answer folder.
 
-
-
 ### Instructions on how to run:
 
 To begin with, followings must be installed to render the score
 	- Python 2.7
 	- NLTK
 	- NLTK Data
-	- Keras
+	- Keras library
 	- Tensorflow
 
 Run the "evaluator.py" located in the evaluator folder.
@@ -21,6 +19,7 @@ $ python evaluator.py
 -----------------------------------------------------------------------------------
 
 "feat_train.csv" and "feat_test.csv" files will be autimatically created within the folder, containing the feature vector values.
+Next step is to use the neural network to create output.
 Run "deep_learning.py" with an additional command to save the output values.
 "deep_learning.py" will take "feat_train.csv" and "feat_test.csv" by default.
 
@@ -51,7 +50,7 @@ $ python score-evaluation.py < output
 - Implemented the Baseline
 - Improved the baseline by various ways
 	- Implemented customized ROSE with 27 features
-	- Implemented deep learning algorithm based on neural network theorem
+	- Implemented learning method using neural network with keras library
 - Bug fixes
 - Writing documentation for the report
 
