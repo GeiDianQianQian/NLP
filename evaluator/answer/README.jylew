@@ -1,19 +1,40 @@
 ## Evaluation - Project - CMPT 825 & CMPT 413
+
 > This README file constains information about the taks performed by `jylew` on the Final Project.
 The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
 
+
+
 ### Instructions on how to run:
-To get an output, run the decode.py located in the answer folder. It takes approximately 47 min on a Macbook Pro (i7).
+
+To begin with, followings must be installed to run **.py
+	- Python 2.7
+	- NLTK
+
+To get an output, run the **.py located in the evaluator folder.
+The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python decode.py > output
+$ python **.py > output
 ------------------------------------------------------
 
-The oupput file will be created within the answer folder, containing the decoded result of the input.
-To test the output file, simply use the output as an input to score-decoder.py
+Before testing the score of the result provided by **.py, you can run check.py to check the output. If there are any errors, check.py will report.
 
 ------------------------------------------------------
-$ python score-decoder.py < output
+$ python check.py < output
+------------------------------------------------------
+
+Final step is to compare the result of **.py with the result of human annotator.
+
+------------------------------------------------------
+$ python score-evaluation.py < output
+------------------------------------------------------
+
+Then the score-evaluation.py will provide the compared score with the accuracy of the **.py.
+Another way of running the **.py is the following:
+
+------------------------------------------------------
+$ python **.py | python check.py | python score-evaluation.py
 ------------------------------------------------------
 
 
