@@ -1,6 +1,9 @@
 ## Evaluation - Project - CMPT 825 & CMPT 413
-> This README file constains information about the taks performed by `sjjung` on the Final Project.
-The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+
+> This README file constains information about the taks performed by `tmosharr` on the Final Project.
+The description of the model used, approaches made, and further analysis are documented in a separate file. You can learn more about the evaluation methodology taken in this project by viewing project.pdf located in the answer folder.
+
+
 
 ### Instructions on how to run:
 
@@ -41,6 +44,7 @@ $ python **.py | python check.py | python score-evaluation.py
 
 
 ### Log
+
 | Date | Author | Message | Abbreviated Hash |
 | Fri Nov 24 16:00:18 2017 -0800 | sjjung | testing ./decoder/decode.py | cf0f703
 | Fri Nov 24 15:44:10 2017 -0800 | sjjung | preparing for submission | 00632fa

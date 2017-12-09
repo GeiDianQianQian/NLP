@@ -1,7 +1,7 @@
 ## Evaluation - Project - CMPT 825 & CMPT 413
 
-> This README file constains information about the taks performed by `jylew` on the Final Project.
-The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+> This README file constains information about the taks performed by `tmosharr` on the Final Project.
+The description of the model used, approaches made, and further analysis are documented in a separate file. You can learn more about the evaluation methodology taken in this project by viewing project.pdf located in the answer folder.
 
 
 
@@ -40,11 +40,15 @@ $ python **.py | python check.py | python score-evaluation.py
 
 
 ### Justin Lew - jylew
+
 - Pair programmed with sjjung, trying to implement the baseline
 - Writing documentation for the project including READme files and the report
 - Programmed using LaTeX
 
+
+
 ### Log
+
 | Date | Author | Message | Abbreviated Hash |
 | Thu Nov 23 22:19:47 2017 -0800 | jylew | pdflatex | 4406fa8
 | Thu Nov 23 22:09:40 2017 -0800 | jylew | finished pseudocode | c59ecb5

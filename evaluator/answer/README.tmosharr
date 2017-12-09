@@ -1,6 +1,9 @@
 ## Evaluation - Project - CMPT 825 & CMPT 413
+
 > This README file constains information about the taks performed by `tmosharr` on the Final Project.
-The description of the mathematical models and algorithm used can be read on file: [description_algorithm.pdf](description_algorithm.pdf)
+The description of the model used, approaches made, and further analysis are documented in a separate file. You can learn more about the evaluation methodology taken in this project by viewing project.pdf located in the answer folder.
+
+
 
 ### Instructions on how to run:
 
@@ -37,11 +40,14 @@ $ python **.py | python check.py | python score-evaluation.py
 
 
 ### Turash Mosharraf - tmosharr
+
 - Implemented the Baseline
 - Setup of GitLab project by commiting initial files
 
 
+
 ### Log
+
 | Date | Author | Message | Abbreviated Hash |
 | 2017-11-25 21:08:17 2017 -0900 | tmosharr | Finished Coding, Wrapping up | 6b20c4b |
 | 2017-11-25 00:12:36 2017 -0800 | tmosharr | dealing with stack underflow | 94b4589 |
