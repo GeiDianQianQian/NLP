@@ -21,8 +21,8 @@ def baseline_model():
 seed = 7
 np.random.seed(seed)
 
-dftrain = pd.read_csv('feature_values.csv')
-dftest = pd.read_csv('feature_values_test.csv')
+dftrain = pd.read_csv('feat_train.csv')
+dftest = pd.read_csv('feat_test.csv')
 dataset_train = dftrain.values
 dataset_test = dftest.values
 X_train = dataset_train[:, 0:27].astype(float)
@@ -49,7 +49,7 @@ model.add(Dense(8, input_dim=27, activation='relu'))
 model.add(Dense(3, activation='softmax' ))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-model.fit(X_train, dummy_y, epochs=30, batch_size= 100, verbose=False)
+model.fit(X_train, dummy_y, epochs=50, batch_size= 100, verbose=False)
 
 predictions= model.predict(X_test)
 for prediction in predictions:
