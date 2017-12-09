@@ -10,6 +10,7 @@ The description of the model used, approaches made, and further analysis are doc
 To begin with, followings must be installed to run **.py
 	- Python 2.7
 	- NLTK
+	- NLTK Data
 
 To get an output, run the **.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
@@ -41,12 +42,11 @@ $ python **.py | python check.py | python score-evaluation.py
 
 ### Seung Jin Jung - sjjung
 
+- Pair programmed with jylew to go through the project
+- Writing documentation for the project including READme files and the report
+- Prepared files for submission
+
 
 
 ### Log
 
-| Date | Author | Message | Abbreviated Hash |
-| Fri Nov 24 16:00:18 2017 -0800 | sjjung | testing ./decoder/decode.py | cf0f703
-| Fri Nov 24 15:44:10 2017 -0800 | sjjung | preparing for submission | 00632fa
-| Fri Nov 24 15:23:45 2017 -0800 | sjjung | README files updated | 5da5fcc
-| Fri Nov 24 15:10:03 2017 -0800 | sjjung | adding README files | cea5a2e
