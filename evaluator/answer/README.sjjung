@@ -7,35 +7,35 @@ The description of the model used, approaches made, and further analysis are doc
 
 ### Instructions on how to run:
 
-To begin with, followings must be installed to run **.py
+To begin with, followings must be installed to run evaluator.py
 	- Python 2.7
 	- NLTK
 	- NLTK Data
 
-To get an output, run the **.py located in the evaluator folder.
+To get an output, run the evaluator.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python **.py > output
+$ python evaluator.py > output
 ------------------------------------------------------
 
-Before testing the score of the result provided by **.py, you can run check.py to check the output. If there are any errors, check.py will report.
+Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
 
 ------------------------------------------------------
 $ python check.py < output
 ------------------------------------------------------
 
-Final step is to compare the result of **.py with the result of human annotator.
+Final step is to compare the result of evaluator.py with the result of human annotator.
 
 ------------------------------------------------------
 $ python score-evaluation.py < output
 ------------------------------------------------------
 
-Then the score-evaluation.py will provide the compared score with the accuracy of the **.py.
-Another way of running the **.py is the following:
+Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
+Another way of running the evaluator.py is the following:
 
 ------------------------------------------------------
-$ python **.py | python check.py | python score-evaluation.py
+$ python evaluator.py | python check.py | python score-evaluation.py
 ------------------------------------------------------
 
 
@@ -50,3 +50,11 @@ $ python **.py | python check.py | python score-evaluation.py
 
 ### Log
 
+| Date | Author | Message | Abbreviated Hash |
+| Fri Dec 8 17:40:51 2017 -0800 | sjjung | waiting for logs | 4327aae |
+| Fri Dec 8 16:54:26 2017 -0800 | sjjung | updated README documentation | 50b43a2 |
+| Fri Dec 8 16:48:55 2017 -0800 | sjjung | added instructions | be47bc6 |
+| Fri Dec 8 16:26:23 2017 -0800 | sjjung | minor update | 0d34768 |
+| Fri Dec 8 13:39:46 2017 -0800 | sjjung | minor update | a01f546 |
+| Fri Dec 8 13:22:23 2017 -0800 | sjjung | READme updated | 83d3539 |
+| Fri Dec 8 13:06:15 2017 -0800 | sjjung | push test in the new environment | 40420e4 |

@@ -1,0 +1,2 @@
+git log --pretty=format:"|%cd | %cn | %s | %h |" --since="2017-11-29" --author=""
+

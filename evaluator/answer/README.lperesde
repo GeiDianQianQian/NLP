@@ -7,35 +7,35 @@ The description of the model used, approaches made, and further analysis are doc
 
 ### Instructions on how to run:
 
-To begin with, followings must be installed to run **.py
+To begin with, followings must be installed to run evaluator.py
 	- Python 2.7
 	- NLTK
 	- NLTK Data
 
-To get an output, run the **.py located in the evaluator folder.
+To get an output, run the evaluator.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python **.py > output
+$ python evaluator.py > output
 ------------------------------------------------------
 
-Before testing the score of the result provided by **.py, you can run check.py to check the output. If there are any errors, check.py will report.
+Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
 
 ------------------------------------------------------
 $ python check.py < output
 ------------------------------------------------------
 
-Final step is to compare the result of **.py with the result of human annotator.
+Final step is to compare the result of evaluator.py with the result of human annotator.
 
 ------------------------------------------------------
 $ python score-evaluation.py < output
 ------------------------------------------------------
 
-Then the score-evaluation.py will provide the compared score with the accuracy of the **.py.
-Another way of running the **.py is the following:
+Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
+Another way of running the evaluator.py is the following:
 
 ------------------------------------------------------
-$ python **.py | python check.py | python score-evaluation.py
+$ python evaluator.py | python check.py | python score-evaluation.py
 ------------------------------------------------------
 
 
@@ -52,3 +52,25 @@ $ python **.py | python check.py | python score-evaluation.py
 
 ### Log
 
+| Date | Author | Message | Abbreviated Hash |
+| Wed Dec 6 00:47:49 2017 -0800 | Luiz Fernando Peres | Comparison table | 346c0c5 |
+| Tue Dec 5 00:34:50 2017 -0800 | Luiz Fernando Peres | Fixing feature vector | 8d8f0a8 |
+| Tue Dec 5 00:14:17 2017 -0800 | Luiz Fernando Peres | Making a new checkpoint | 62d1d99 |
+| Mon Dec 4 22:52:14 2017 -0800 | Luiz Fernando Peres | Improved a 0.01 | 6885c2b |
+| Mon Dec 4 17:42:54 2017 -0800 | Luiz Fernando Peres | Created a file improve that does not improve the code haha | 039ab26 |
+| Sun Dec 3 23:28:53 2017 -0800 | Luiz Fernando Peres | Improved a little more | 89e9f87 |
+| Sun Dec 3 21:23:07 2017 -0800 | Luiz Fernando Peres | Improving to a 0.546 | e7e3271 |
+| Sun Dec 3 20:40:21 2017 -0800 | Luiz Fernando Peres | Improved a little bit more | de8826a |
+| Sun Dec 3 17:08:49 2017 -0800 | Luiz Fernando Peres | Cleaning code | 467f855 |
+| Sun Dec 3 16:58:01 2017 -0800 | Luiz Fernando Peres | Getting a 0.541 | d01212a |
+| Sun Dec 3 01:39:53 2017 -0800 | Luiz Fernando Peres | Merge branch 'master' of csil-git1.cs.surrey.sfu.ca:lperesde/nlpclass-1777-pixel | 0519c4a |
+| Sun Dec 3 01:39:43 2017 -0800 | Luiz Fernando Peres | Ngram model is already done :) | d29cfd3 |
+| Sun Dec 3 01:14:47 2017 -0800 | Luiz Fernando Peres | Getting a 0.54 | 325b0d3 |
+| Sat Dec 2 18:00:59 2017 -0800 | Luiz Fernando Peres | Submitting a bit better answer | 6dc9f5d |
+| Sat Dec 2 17:35:54 2017 -0800 | Luiz Fernando Peres | Getting a 51.7365 | 0deb972 |
+| Sat Dec 2 04:24:58 2017 -0800 | Luiz Fernando Peres | Updating output file 1 | a2487f8 |
+| Sat Dec 2 04:23:59 2017 -0800 | Luiz Fernando Peres | Improved a little bit | 6d58462 |
+| Sat Dec 2 02:46:04 2017 -0800 | Luiz Fernando Peres | Getting a 0.51 | 5758421 |
+| Sat Dec 2 02:22:13 2017 -0800 | Luiz Fernando Peres | Implementing features vector | 7216786 |
+| Fri Dec 1 17:07:00 2017 -0800 | Luiz Fernando Peres | Adding reranker files for tests | 97a4e3c |
+| Fri Dec 1 16:59:55 2017 -0800 | Luiz Fernando Peres | Copying turash files | 34af0df |

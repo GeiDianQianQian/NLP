@@ -7,35 +7,35 @@ The description of the model used, approaches made, and further analysis are doc
 
 ### Instructions on how to run:
 
-To begin with, followings must be installed to run **.py
+To begin with, followings must be installed to run evaluator.py
 	- Python 2.7
 	- NLTK
 	- NLTK Data
 
-To get an output, run the **.py located in the evaluator folder.
+To get an output, run the evaluator.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python **.py > output
+$ python evaluator.py > output
 ------------------------------------------------------
 
-Before testing the score of the result provided by **.py, you can run check.py to check the output. If there are any errors, check.py will report.
+Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
 
 ------------------------------------------------------
 $ python check.py < output
 ------------------------------------------------------
 
-Final step is to compare the result of **.py with the result of human annotator.
+Final step is to compare the result of evaluator.py with the result of human annotator.
 
 ------------------------------------------------------
 $ python score-evaluation.py < output
 ------------------------------------------------------
 
-Then the score-evaluation.py will provide the compared score with the accuracy of the **.py.
-Another way of running the **.py is the following:
+Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
+Another way of running the evaluator.py is the following:
 
 ------------------------------------------------------
-$ python **.py | python check.py | python score-evaluation.py
+$ python evaluator.py | python check.py | python score-evaluation.py
 ------------------------------------------------------
 
 
@@ -49,4 +49,10 @@ $ python **.py | python check.py | python score-evaluation.py
 
 
 ### Log
+
+| Date | Author | Message | Abbreviated Hash |
+| Thu Dec 7 15:02:47 2017 -0800 | jylew | added References to paper | fbe4808 |
+| Wed Dec 6 15:32:26 2017 -0800 | jylew | almost done paper, added bibtex file for reference | bfdd64b |
+| Tue Dec 5 01:54:08 2017 -0800 | jylew | started paper | e51c581 |
+
 

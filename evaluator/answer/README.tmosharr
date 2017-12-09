@@ -7,35 +7,35 @@ The description of the model used, approaches made, and further analysis are doc
 
 ### Instructions on how to run:
 
-To begin with, followings must be installed to run **.py
+To begin with, followings must be installed to run evaluator.py
 	- Python 2.7
 	- NLTK
 	- NLTK Data
 
-To get an output, run the **.py located in the evaluator folder.
+To get an output, run the evaluator.py located in the evaluator folder.
 The output file will be created within the folder, containing the list of values of either -1, 0, or 1.
 
 ------------------------------------------------------
-$ python **.py > output
+$ python evaluator.py > output
 ------------------------------------------------------
 
-Before testing the score of the result provided by **.py, you can run check.py to check the output. If there are any errors, check.py will report.
+Before testing the score of the result provided by evaluator.py, you can run check.py to check the output. If there are any errors, check.py will report.
 
 ------------------------------------------------------
 $ python check.py < output
 ------------------------------------------------------
 
-Final step is to compare the result of **.py with the result of human annotator.
+Final step is to compare the result of evaluator.py with the result of human annotator.
 
 ------------------------------------------------------
 $ python score-evaluation.py < output
 ------------------------------------------------------
 
-Then the score-evaluation.py will provide the compared score with the accuracy of the **.py.
-Another way of running the **.py is the following:
+Then the score-evaluation.py will provide the compared score with the accuracy of the evaluator.py.
+Another way of running the evaluator.py is the following:
 
 ------------------------------------------------------
-$ python **.py | python check.py | python score-evaluation.py
+$ python evaluator.py | python check.py | python score-evaluation.py
 ------------------------------------------------------
 
 
@@ -50,6 +50,13 @@ $ python **.py | python check.py | python score-evaluation.py
 
 
 
-
 ### Log
 
+| Date | Author | Message | Abbreviated Hash |
+| Thu Dec 7 06:49:37 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | 3bc3d95 |
+| Thu Dec 7 06:48:44 2017 -0900 | tmosharr | Implemented Customized version of ROSE with 27 features, weights are optimized using Neural Network | be57ad5 |
+| Wed Dec 6 09:37:29 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | d4b9513 |
+| Wed Dec 6 09:36:40 2017 -0900 | tmosharr | improved upto 0.555, trying to add parts of speech tagging | fde8b5f |
+| Sat Dec 2 16:28:49 2017 -0900 | tmosharr | Merge branch 'master' of https://csil-git1.cs.surrey.sfu.ca/lperesde/nlpclass-1777-pixel | cd2583c |
+| Sat Dec 2 16:27:54 2017 -0900 | tmosharr | mateor and bleu | 6aacb82 |
+| Thu Nov 30 09:29:50 2017 -0900 | tmosharr | implemented baseline for evaluator | 3417678 |
