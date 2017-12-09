@@ -1,0 +1,33 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Kahn \bgroup et al.\egroup }2009]{kahn2009expected}
+Jeremy~G Kahn, Matthew Snover, and Mari Ostendorf.
+\newblock 2009.
+\newblock Expected dependency pair match: predicting translation quality with
+  expected syntactic structure.
+\newblock {\em Machine Translation}, 23(2):169--179.
+
+\bibitem[\protect\citename{Lavie and Agarwal}2007]{lavie2007meteor}
+Alon Lavie and Abhaya Agarwal.
+\newblock 2007.
+\newblock Meteor: An automatic metric for mt evaluation with high levels of
+  correlation with human judgments.
+\newblock In {\em Proceedings of the Second Workshop on Statistical Machine
+  Translation}, pages 228--231. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Lodhi \bgroup et al.\egroup }2002]{lodhi2002text}
+Huma Lodhi, Craig Saunders, John Shawe-Taylor, Nello Cristianini, and Chris
+  Watkins.
+\newblock 2002.
+\newblock Text classification using string kernels.
+\newblock {\em Journal of Machine Learning Research}, 2(Feb):419--444.
+
+\bibitem[\protect\citename{Song and Cohn}2011]{song2011regression}
+Xingyi Song and Trevor Cohn.
+\newblock 2011.
+\newblock Regression and ranking based optimisation for sentence level machine
+  translation evaluation.
+\newblock In {\em Proceedings of the Sixth Workshop on Statistical Machine
+  Translation}, pages 123--129. Association for Computational Linguistics.
+
+\end{thebibliography}
